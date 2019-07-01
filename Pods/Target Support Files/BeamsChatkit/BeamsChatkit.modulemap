@@ -1,0 +1,6 @@
+framework module BeamsChatkit {
+  umbrella header "BeamsChatkit-umbrella.h"
+
+  export *
+  module * { export * }
+}
