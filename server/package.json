@@ -1,0 +1,20 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "create-environment": "node create-environment.js",
+    "cleanup": "node cleanup.js",
+    "cleanup-full": "node cleanup-full.js",
+    "lookup": "node lookup.js",
+    "serve-token": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@pusher/chatkit-server": "^2.0.0",
+    "express": "^4.17.1"
+  }
+}

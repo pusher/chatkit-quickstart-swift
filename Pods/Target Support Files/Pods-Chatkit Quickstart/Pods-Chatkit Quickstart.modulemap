@@ -1,6 +1,0 @@
-framework module Pods_Chatkit_Quickstart {
-  umbrella header "Pods-Chatkit Quickstart-umbrella.h"
-
-  export *
-  module * { export * }
-}
