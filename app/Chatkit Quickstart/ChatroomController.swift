@@ -1,4 +1,5 @@
 import UIKit
+//TODO - import PusherChatkit
 
 class ChatroomViewController: UIViewController {
     
@@ -24,17 +25,19 @@ class ChatroomViewController: UIViewController {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         messagesTableView.delegate = self
         messagesTableView.dataSource = self
-        //TODO:
+        //TODO: Initiate Chatkit with your user ID
     }
     
     func sendMessage(_ message: String) {
     }
 }
 
+//TODO create PCRoomDelegate extension
+
 extension ChatroomViewController: UITableViewDelegate {}
 
 extension ChatroomViewController: UITableViewDataSource {
-    
+    //TODO: empty implementation - replace with your own
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 0
     }

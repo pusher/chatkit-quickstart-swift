@@ -6,5 +6,6 @@ target 'Chatkit Quickstart' do
   use_frameworks!
 
   # Pods for Chatkit Quickstart
+  pod 'PusherChatkit'
 
 end

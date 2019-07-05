@@ -1,12 +1,15 @@
 import UIKit
+//TODO import PusherChatkit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     
-    //TODO: initChatkit function goes here!
+    //TODO: add initChatkit function!
 }
+
+//TODO: add ChatManagerDelegate extension
 
 
 
