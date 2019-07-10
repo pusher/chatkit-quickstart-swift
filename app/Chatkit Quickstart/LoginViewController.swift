@@ -11,7 +11,7 @@ class LoginViewController: UIViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        if (segue.identifier == "loginWithCurrentUser") {
+        if (segue.identifier == "loginWithUserId") {
             print("Segue starting")
             
             let vc = segue.destination as! ChatroomViewController

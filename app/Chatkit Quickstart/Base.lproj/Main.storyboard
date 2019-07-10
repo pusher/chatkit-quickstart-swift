@@ -30,7 +30,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Login"/>
                                 <connections>
-                                    <segue destination="RdU-Tu-zHR" kind="show" identifier="loginWithCurrentUser" id="6me-p9-Nzv"/>
+                                    <segue destination="RdU-Tu-zHR" kind="show" identifier="loginWithUserId" id="6me-p9-Nzv"/>
                                 </connections>
                             </button>
                         </subviews>
