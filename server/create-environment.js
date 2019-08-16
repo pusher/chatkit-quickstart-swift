@@ -33,50 +33,58 @@ async function create() {
     console.log(`Created room: ${room.id}`)
 
     //Seeding a conversation...
+    /**
+      Conversation sourced from Monty Python
+      http://montypython.50webs.com/scripts/Holy_Grail/Scene22.htm
+    **/
     await chatkit.sendSimpleMessage({
         roomId: room.id,
         userId: 'bob',
-        text: 'How much wood could a woodchuck chuck if a woodchuck could chuck wood?',
+        text: 'What is your quest?',
     })
 
     await chatkit.sendSimpleMessage({
       roomId: room.id,
       userId: "alice",
       text:
-        "A woodchuck would chuck no amount of wood since a woodchuck can’t chuck wood."
+        "To seek the Holy Grail!"
     })
 
     await chatkit.sendSimpleMessage({
       roomId: room.id,
       userId: "bob",
       text:
-        "But if a woodchuck could chuck and would chuck some amount of wood, what amount of wood would a woodchuck chuck?"
+        "What... is the air-speed velocity of an unladen swallow?"
     })
 
     await chatkit.sendSimpleMessage({
       roomId: room.id,
       userId: "alice",
       text:
-        "Even if a woodchuck could chuck wood and even if a woodchuck would chuck wood, should a woodchuck chuck wood?"
+        "What do you mean? An African or European swallow?"
     })
 
     await chatkit.sendSimpleMessage({
       roomId: room.id,
       userId: "bob",
       text:
-        "A woodchuck should chuck if a woodchuck could chuck wood, as long as a woodchuck would chuck wood."
+        "Huh? I-- I don't know that. Auuuuuuuugh!"
+    })
+
+    await chatkit.sendSimpleMessage({
+      roomId: room.id,
+      userId: "bob",
+      text:
+        "How do know so much about swallows?"
     })
 
     await chatkit.sendSimpleMessage({
       roomId: room.id,
       userId: "alice",
-      text: "Oh shut up."
+      text: "Well, you have to know these things when you're a king, you know!"
     })
 
     console.log("Seeded the room with messages")
 }
 
 create()
-
-
-  
