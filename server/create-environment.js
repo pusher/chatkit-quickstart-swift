@@ -75,7 +75,7 @@ async function create() {
       roomId: room.id,
       userId: "bob",
       text:
-        "How do know so much about swallows?"
+        "How do you know so much about swallows?"
     })
 
     await chatkit.sendSimpleMessage({
