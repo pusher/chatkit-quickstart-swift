@@ -7,26 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D2C15662346441300D444C9 /* Chatkit.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2D2C15652346441300D444C9 /* Chatkit.plist */; };
 		2D83909B22BCD5A5005DB609 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D83909A22BCD5A5005DB609 /* AppDelegate.swift */; };
-		2D83909D22BCD5A5005DB609 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D83909C22BCD5A5005DB609 /* LoginViewController.swift */; };
 		2D8390A022BCD5A5005DB609 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2D83909E22BCD5A5005DB609 /* Main.storyboard */; };
 		2D8390A222BCD5A6005DB609 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2D8390A122BCD5A6005DB609 /* Assets.xcassets */; };
 		2D8390A522BCD5A6005DB609 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2D8390A322BCD5A6005DB609 /* LaunchScreen.storyboard */; };
-		2DD5541322CCDBC0002CA254 /* ChatroomController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DD5541222CCDBC0002CA254 /* ChatroomController.swift */; };
+		2DD5541322CCDBC0002CA254 /* ChatroomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DD5541222CCDBC0002CA254 /* ChatroomViewController.swift */; };
 		8CDC2DF53CC309EF8B066A09 /* Pods_Chatkit_Quickstart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C96E546C2609DAB0E2D09D1 /* Pods_Chatkit_Quickstart.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1C96E546C2609DAB0E2D09D1 /* Pods_Chatkit_Quickstart.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Chatkit_Quickstart.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		221CFF13EDF6C05D7459D495 /* Pods-Chatkit Quickstart.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chatkit Quickstart.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Chatkit Quickstart/Pods-Chatkit Quickstart.debug.xcconfig"; sourceTree = "<group>"; };
+		2D2C15652346441300D444C9 /* Chatkit.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Chatkit.plist; sourceTree = "<group>"; };
 		2D83909722BCD5A5005DB609 /* Chatkit Quickstart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Chatkit Quickstart.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D83909A22BCD5A5005DB609 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		2D83909C22BCD5A5005DB609 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		2D83909F22BCD5A5005DB609 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		2D8390A122BCD5A6005DB609 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2D8390A422BCD5A6005DB609 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2D8390A622BCD5A6005DB609 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2DD5541222CCDBC0002CA254 /* ChatroomController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatroomController.swift; sourceTree = "<group>"; };
+		2DD5541222CCDBC0002CA254 /* ChatroomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatroomViewController.swift; sourceTree = "<group>"; };
 		654142B31ECEFA9FEEBA0F3D /* Pods-Chatkit Quickstart.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chatkit Quickstart.release.xcconfig"; path = "Pods/Target Support Files/Pods-Chatkit Quickstart/Pods-Chatkit Quickstart.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -71,13 +71,13 @@
 		2D83909922BCD5A5005DB609 /* Chatkit Quickstart */ = {
 			isa = PBXGroup;
 			children = (
-				2DD5541222CCDBC0002CA254 /* ChatroomController.swift */,
+				2DD5541222CCDBC0002CA254 /* ChatroomViewController.swift */,
 				2D83909A22BCD5A5005DB609 /* AppDelegate.swift */,
-				2D83909C22BCD5A5005DB609 /* LoginViewController.swift */,
 				2D83909E22BCD5A5005DB609 /* Main.storyboard */,
 				2D8390A122BCD5A6005DB609 /* Assets.xcassets */,
 				2D8390A322BCD5A6005DB609 /* LaunchScreen.storyboard */,
 				2D8390A622BCD5A6005DB609 /* Info.plist */,
+				2D2C15652346441300D444C9 /* Chatkit.plist */,
 			);
 			path = "Chatkit Quickstart";
 			sourceTree = "<group>";
@@ -102,6 +102,7 @@
 				2D83909322BCD5A5005DB609 /* Sources */,
 				2D83909422BCD5A5005DB609 /* Frameworks */,
 				2D83909522BCD5A5005DB609 /* Resources */,
+				325192C0BBC750C59753F402 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -153,12 +154,39 @@
 				2D8390A522BCD5A6005DB609 /* LaunchScreen.storyboard in Resources */,
 				2D8390A222BCD5A6005DB609 /* Assets.xcassets in Resources */,
 				2D8390A022BCD5A5005DB609 /* Main.storyboard in Resources */,
+				2D2C15662346441300D444C9 /* Chatkit.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		325192C0BBC750C59753F402 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-Chatkit Quickstart/Pods-Chatkit Quickstart-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/PushNotifications/PushNotifications.framework",
+				"${BUILT_PRODUCTS_DIR}/PusherChatkit/PusherChatkit.framework",
+				"${BUILT_PRODUCTS_DIR}/PusherPlatform/PusherPlatform.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PushNotifications.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PusherChatkit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PusherPlatform.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Chatkit Quickstart/Pods-Chatkit Quickstart-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		3DA6C67AB113607138BE8FC6 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -188,9 +216,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2D83909D22BCD5A5005DB609 /* LoginViewController.swift in Sources */,
 				2D83909B22BCD5A5005DB609 /* AppDelegate.swift in Sources */,
-				2DD5541322CCDBC0002CA254 /* ChatroomController.swift in Sources */,
+				2DD5541322CCDBC0002CA254 /* ChatroomViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
