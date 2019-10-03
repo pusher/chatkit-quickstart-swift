@@ -1,5 +1,4 @@
 import UIKit
-//TODO - import PusherChatkit
 import PusherChatkit
 
 class ChatroomViewController: UIViewController {
@@ -10,7 +9,7 @@ class ChatroomViewController: UIViewController {
     @IBAction func onSendClicked(_ sender: Any) {
         let messageToSend = textEntry.text!
         if !messageToSend.isEmpty {
-          sendMessage(messageToSend)
+            sendMessage(messageToSend)
         }
     }
     
@@ -19,20 +18,24 @@ class ChatroomViewController: UIViewController {
             print("Error in Chat manager delegate! \(error.localizedDescription)")
         }
     }
-    
-    var userId: String = "alice"
-    var roomId: String = "alice&bob"
+
     public var chatManager: ChatManager?
     public var currentUser: PCCurrentUser?
     
-    //TODO create messages array
     var messages = [PCMultipartMessage]()
-
-    func initChatkit(_ userId: String, _ callback: @escaping (_ currentUser: PCCurrentUser) -> Void){
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        guard let chatkitInfo = plistValues(bundle: Bundle.main) else { return }
+        
+        messagesTableView.delegate = self
+        messagesTableView.dataSource = self
+        
         self.chatManager = ChatManager(
-            instanceLocator: "v1:us1:d38e1721-2363-44f7-b9d3-743fcff90930",
-            tokenProvider: PCTokenProvider(url: "https://us1.pusherplatform.io/services/chatkit_token_provider/v1/d38e1721-2363-44f7-b9d3-743fcff90930/token"),
-            userID: userId
+            instanceLocator: chatkitInfo.instanceLocator,
+            tokenProvider: PCTokenProvider(url: chatkitInfo.tokenProviderEndpoint),
+            userID: chatkitInfo.userId
         )
         chatManager!.connect(delegate: MyChatManagerDelegate()) { (currentUser, error) in
             guard(error == nil) else {
@@ -40,20 +43,9 @@ class ChatroomViewController: UIViewController {
                 return
             }
             self.currentUser = currentUser
-            callback(currentUser!)
-        }
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        messagesTableView.delegate = self
-        messagesTableView.dataSource = self
-        //TODO: Initiate Chatkit with your user ID
-        initChatkit(self.userId) { (currentUser) in
-            let firstRoom = currentUser.rooms.first!
+            let firstRoom = currentUser!.rooms.first!
             // Subscribe to the first room
-            currentUser.subscribeToRoomMultipart(room: firstRoom, roomDelegate: self, completionHandler: { (error) in
+            currentUser!.subscribeToRoomMultipart(room: firstRoom, roomDelegate: self, completionHandler: { (error) in
                 guard error == nil else {
                     print("Error subscribing to room: \(error!.localizedDescription)")
                     return
@@ -62,6 +54,7 @@ class ChatroomViewController: UIViewController {
             })
             
         }
+        
     }
     
     func sendMessage(_ message: String) {
@@ -102,7 +95,7 @@ extension ChatroomViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return messages.count
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MessageCell", for: indexPath)
         let message = messages[indexPath.row]
@@ -121,22 +114,30 @@ extension ChatroomViewController: UITableViewDataSource {
     }
 }
 
-func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
-    guard
-        let path = bundle.path(forResource: "Chatkit", ofType: "plist"),
-        let values = NSDictionary(contentsOfFile: path) as? [String: Any]
-        else {
-            print("Missing Chatkit.plist file with 'ClientId' and 'Domain' entries in main bundle! TODO reword")
-            return nil
-    }
-    
-    guard
-        let clientId = values["ClientId"] as? String,
-        let domain = values["Domain"] as? String
-        else {
-            print("Auth0.plist file at \(path) is missing 'ClientId' and/or 'Domain' entries!")
-            print("File currently has the following entries: \(values)")
-            return nil
-    }
-    return (clientId: clientId, domain: domain)
+//Chatkit.plist values parser
+//Taken from Auth0's excellent samples - https://github.com/auth0-samples/auth0-ios-swift-sample/blob/master/00-Login/Auth0Sample/HomeViewController.swift#L75
+func plistValues(bundle: Bundle) -> (
+    instanceLocator: String,
+    tokenProviderEndpoint: String,
+    userId: String,
+    roomId: String)? {
+        guard
+            let path = bundle.path(forResource: "Chatkit", ofType: "plist"),
+            let values = NSDictionary(contentsOfFile: path) as? [String: Any]
+            else {
+                print("Missing Chatkit.plist file with 'ChatkitInstanceLocator', 'ChatkitTokenProviderEndpoint', 'ChatkitUserId', and 'ChatkitRoomId' entries in main bundle!")
+                return nil
+        }
+        
+        guard
+            let instanceLocator = values["ChatkitInstanceLocator"] as? String,
+            let tokenProviderEndpoint = values["ChatkitTokenProviderEndpoint"] as? String,
+            let userId = values["ChatkitUserId"] as? String,
+            let roomId = values["ChatkitRoomId"] as? String
+            else {
+                print("Chatkit.plist file at \(path) is missing 'ChatkitInstanceLocator', 'ChatkitTokenProviderEndpoint', 'ChatkitUserId', and/or 'ChatkitRoomId' entries!")
+                print("File currently has the following entries: \(values)")
+                return nil
+        }
+        return (instanceLocator: instanceLocator, tokenProviderEndpoint: tokenProviderEndpoint, userId: userId, roomId: roomId)
 }
