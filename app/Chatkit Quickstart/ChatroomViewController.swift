@@ -3,26 +3,19 @@ import PusherChatkit
 
 class ChatroomViewController: UIViewController {
     
-    
     @IBOutlet weak var messagesTableView: UITableView!
     @IBOutlet weak var textEntry: UITextField!
-    @IBAction func onSendClicked(_ sender: Any) {
-        let messageToSend = textEntry.text!
-        if !messageToSend.isEmpty {
-            sendMessage(messageToSend)
-        }
-    }
     
     class MyChatManagerDelegate: PCChatManagerDelegate {
         func onError(error: Error) {
             print("Error in Chat manager delegate! \(error.localizedDescription)")
         }
     }
-
+    
     public var chatManager: ChatManager?
     public var currentUser: PCCurrentUser?
-    
     var messages = [PCMultipartMessage]()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,11 +25,14 @@ class ChatroomViewController: UIViewController {
         messagesTableView.delegate = self
         messagesTableView.dataSource = self
         
+        //Init Chatkit
         self.chatManager = ChatManager(
             instanceLocator: chatkitInfo.instanceLocator,
             tokenProvider: PCTokenProvider(url: chatkitInfo.tokenProviderEndpoint),
             userID: chatkitInfo.userId
         )
+        
+        //Connect to Chatkit and subscribe to a room
         chatManager!.connect(delegate: MyChatManagerDelegate()) { (currentUser, error) in
             guard(error == nil) else {
                 print("Error connecting: \(error!.localizedDescription)")
@@ -52,11 +48,18 @@ class ChatroomViewController: UIViewController {
                 }
                 print("Successfully subscribed to the room!")
             })
-            
         }
         
     }
     
+    @IBAction func onSendClicked(_ sender: Any) {
+        let messageToSend = textEntry.text!
+        if !messageToSend.isEmpty {
+            sendMessage(messageToSend)
+        }
+    }
+    
+    //Send a message
     func sendMessage(_ message: String) {
         currentUser!.sendSimpleMessage(
             roomID: currentUser!.rooms.first!.id,
@@ -73,10 +76,10 @@ class ChatroomViewController: UIViewController {
         )
     }
     
-    
 }
 
-//TODO create PCRoomDelegate extension
+
+//Handle incoming message
 extension ChatroomViewController: PCRoomDelegate {
     func onMultipartMessage(_ message: PCMultipartMessage) {
         print("Message received!")
@@ -90,16 +93,17 @@ extension ChatroomViewController: PCRoomDelegate {
 
 extension ChatroomViewController: UITableViewDelegate {}
 
+//Render messages
 extension ChatroomViewController: UITableViewDataSource {
-    //TODO: empty implementation - replace with your own
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return messages.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MessageCell", for: indexPath)
+        
         let message = messages[indexPath.row]
-        let senderDisplayName = message.sender.displayName
+        let sender = message.sender
         var messageText = ""
         
         switch message.parts.first!.payload {
@@ -109,7 +113,11 @@ extension ChatroomViewController: UITableViewDataSource {
             print("Message doesn't have the right payload!")
         }
         
-        cell.textLabel?.text = "\(senderDisplayName): \(messageText)"
+        cell.textLabel?.text = sender.displayName
+        cell.detailTextLabel?.text = messageText
+        if(sender.avatarURL != nil){
+            cell.imageView?.setImageFromUrl(ImageURL: sender.avatarURL!, tableview: tableView)
+        }
         return cell
     }
 }
@@ -140,4 +148,20 @@ func plistValues(bundle: Bundle) -> (
                 return nil
         }
         return (instanceLocator: instanceLocator, tokenProviderEndpoint: tokenProviderEndpoint, userId: userId, roomId: roomId)
+}
+
+
+//Extension for loading an image into an UIImageView from a URL string
+//Inspired by tutorialspoint https://www.tutorialspoint.com/lazy-loading-of-images-in-table-view-using-swift
+extension UIImageView {
+    func setImageFromUrl(ImageURL: String, tableview: UITableView) {
+        URLSession.shared.dataTask( with: NSURL(string:ImageURL)! as URL, completionHandler: {
+            (data, response, error) -> Void in
+            DispatchQueue.main.async {
+                if let data = data {
+                    self.image = UIImage(data: data)
+                }
+            }
+        }).resume()
+    }
 }
