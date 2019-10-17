@@ -42,7 +42,7 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" image="placeholder" id="8eb-tc-NOv">
+                                                <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" image="AvatarPlaceholder" id="8eb-tc-NOv">
                                                     <rect key="frame" x="15" y="0.0" width="56" height="55.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </imageView>
@@ -96,6 +96,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="placeholder" width="256" height="256"/>
+        <image name="AvatarPlaceholder" width="350" height="350"/>
     </resources>
 </document>

@@ -46,10 +46,9 @@ class ChatroomViewController: UIViewController {
                     print("Error subscribing to room: \(error!.localizedDescription)")
                     return
                 }
-                print("Successfully subscribed to the room!")
+                print("Successfully subscribed to the room! 👋")
             })
         }
-        
     }
     
     @IBAction func onSendClicked(_ sender: Any) {
