@@ -18,6 +18,14 @@ Recent versions of:
 - `app` - the Xcode project with the sample app
 - `server` - the corresponding server scripts
 
+## Running and usage
+
+- Create a Pusher Chatkit instance at (dash.pusher.com/chatkit)[https://dash.pusher.com/chatkit]
+- In the `server` directory run add your Chatkit instance credentials into `chatkit.js`, then run `npm install`, and finally `npm run create-environment`
+- In the `app/Chatkit Quickstart/` directory in the iOS project populate the file `Chatkit.plist` with your Chatkit instance locator and test token provider endpoint.
+- In the `app` directory run `pod install`
+- Open the generated `XCWorkspace` file and run the project.
+
 ## Assets attribution
 
 User avatar images used in the demo app are made by [Freepik](https://www.freepik.com/home) from www.flaticon.com
