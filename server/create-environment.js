@@ -4,14 +4,16 @@ async function create() {
     //Creating users
 
     const usersToCreate = [
-        {
-            id: "alice",
-            name: "Alice A"
-        },
-        {
-            id: "bob",
-            name: "Bob B"
-        }
+      {
+        id: "alice",
+        name: "Alice Antelope",
+        avatarURL: "https://imgur.com/km7Gt2P.png"
+      },
+      {
+        id: "bob",
+        name: "Bob Badger",
+        avatarURL: "https://imgur.com/KCNNTdA.png"
+      }
     ]
     let users = await chatkit.createUsers({
         users: usersToCreate
@@ -23,7 +25,7 @@ async function create() {
 
     //Creating a room with 2 members
     let room = await chatkit.createRoom({
-        id: 'alice;bob',
+        id: 'alice_and_bob',
         creatorId: 'alice',
         isPrivate: true,
         name: 'Alice A, Bob B',
@@ -87,4 +89,6 @@ async function create() {
     console.log("Seeded the room with messages")
 }
 
-create()
+create().catch(e => {
+    console.log(e)
+})

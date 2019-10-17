@@ -7,6 +7,7 @@ async function lookup() {
     let users = await chatkit.getUsers()
     users.forEach(user => {
         console.log(user.id)
+        console.log(user.avatar_url)
     });
 
     console.log("Rooms:")
@@ -16,7 +17,5 @@ async function lookup() {
         console.log(`Room Name: ${room.name} ID: ${room.id}`)
     })
 }
-
-
 
 lookup()
