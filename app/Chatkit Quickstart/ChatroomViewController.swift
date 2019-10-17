@@ -1,21 +1,9 @@
 import UIKit
-import PusherChatkit
 
 class ChatroomViewController: UIViewController {
     
     @IBOutlet weak var messagesTableView: UITableView!
     @IBOutlet weak var textEntry: UITextField!
-    
-    class MyChatManagerDelegate: PCChatManagerDelegate {
-        func onError(error: Error) {
-            print("Error in Chat manager delegate! \(error.localizedDescription)")
-        }
-    }
-    
-    public var chatManager: ChatManager?
-    public var currentUser: PCCurrentUser?
-    var messages = [PCMultipartMessage]()
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,30 +13,9 @@ class ChatroomViewController: UIViewController {
         messagesTableView.delegate = self
         messagesTableView.dataSource = self
         
-        //Init Chatkit
-        self.chatManager = ChatManager(
-            instanceLocator: chatkitInfo.instanceLocator,
-            tokenProvider: PCTokenProvider(url: chatkitInfo.tokenProviderEndpoint),
-            userID: chatkitInfo.userId
-        )
-        
-        //Connect to Chatkit and subscribe to a room
-        chatManager!.connect(delegate: MyChatManagerDelegate()) { (currentUser, error) in
-            guard(error == nil) else {
-                print("Error connecting: \(error!.localizedDescription)")
-                return
-            }
-            self.currentUser = currentUser
-            let firstRoom = currentUser!.rooms.first!
-            // Subscribe to the first room
-            currentUser!.subscribeToRoomMultipart(room: firstRoom, roomDelegate: self, completionHandler: { (error) in
-                guard error == nil else {
-                    print("Error subscribing to room: \(error!.localizedDescription)")
-                    return
-                }
-                print("Successfully subscribed to the room! 👋")
-            })
-        }
+        //TODO: Init Chatkit
+     
+        //TODO: Connect to Chatkit and subscribe to a room
     }
     
     @IBAction func onSendClicked(_ sender: Any) {
@@ -58,65 +25,27 @@ class ChatroomViewController: UIViewController {
         }
     }
     
-    //Send a message
+    //TODO: Send a message
     func sendMessage(_ message: String) {
-        currentUser!.sendSimpleMessage(
-            roomID: currentUser!.rooms.first!.id,
-            text: message,
-            completionHandler: { (messageID, error) in
-                guard error == nil else {
-                    print("Error sending message: \(error!.localizedDescription)")
-                    return
-                }
-                DispatchQueue.main.async {
-                    self.textEntry.text = ""
-                }
-        }
-        )
+        
     }
     
 }
 
 
-//Handle incoming message
-extension ChatroomViewController: PCRoomDelegate {
-    func onMultipartMessage(_ message: PCMultipartMessage) {
-        print("Message received!")
-        DispatchQueue.main.async {
-            self.messages.append(message)
-            self.messagesTableView.reloadData()
-        }
-    }
-}
+//TODO: Handle incoming message
 
 
 extension ChatroomViewController: UITableViewDelegate {}
 
-//Render messages
+//TODO: Render messages
 extension ChatroomViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messages.count
+        return 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MessageCell", for: indexPath)
-        
-        let message = messages[indexPath.row]
-        let sender = message.sender
-        var messageText = ""
-        
-        switch message.parts.first!.payload {
-        case .inline(let payload):
-            messageText = payload.content
-        default:
-            print("Message doesn't have the right payload!")
-        }
-        
-        cell.textLabel?.text = sender.displayName
-        cell.detailTextLabel?.text = messageText
-        if(sender.avatarURL != nil){
-            cell.imageView?.setImageFromUrl(ImageURL: sender.avatarURL!, tableview: tableView)
-        }
         return cell
     }
 }
