@@ -17,3 +17,8 @@ Recent versions of:
 
 - `app` - the Xcode project with the sample app
 - `server` - the corresponding server scripts
+
+## Assets attribution
+
+User avatar images used in the demo app are made by [Freepik](https://www.freepik.com/home) from www.flaticon.com
+
