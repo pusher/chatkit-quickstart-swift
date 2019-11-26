@@ -1,4 +1,5 @@
 import UIKit
+// Import Chatkit dependency
 import PusherChatkit
 
 class ChatroomViewController: UIViewController {
@@ -6,6 +7,7 @@ class ChatroomViewController: UIViewController {
     @IBOutlet weak var messagesTableView: UITableView!
     @IBOutlet weak var textEntry: UITextField!
     
+    // Class params and inner classes
     class MyChatManagerDelegate: PCChatManagerDelegate {
         func onError(error: Error) {
             print("Error in Chat manager delegate! \(error.localizedDescription)")
@@ -25,22 +27,23 @@ class ChatroomViewController: UIViewController {
         messagesTableView.delegate = self
         messagesTableView.dataSource = self
         
-        //Init Chatkit
+        // Init Chatkit
         self.chatManager = ChatManager(
             instanceLocator: chatkitInfo.instanceLocator,
             tokenProvider: PCTokenProvider(url: chatkitInfo.tokenProviderEndpoint),
             userID: chatkitInfo.userId
         )
         
-        //Connect to Chatkit and subscribe to a room
+        // Connect to Chatkit
         chatManager!.connect(delegate: MyChatManagerDelegate()) { (currentUser, error) in
             guard(error == nil) else {
                 print("Error connecting: \(error!.localizedDescription)")
                 return
             }
             self.currentUser = currentUser
-            let firstRoom = currentUser!.rooms.first!
+            
             // Subscribe to the first room
+            let firstRoom = currentUser!.rooms.first!
             currentUser!.subscribeToRoomMultipart(room: firstRoom, roomDelegate: self, completionHandler: { (error) in
                 guard error == nil else {
                     print("Error subscribing to room: \(error!.localizedDescription)")
@@ -92,7 +95,7 @@ extension ChatroomViewController: PCRoomDelegate {
 
 extension ChatroomViewController: UITableViewDelegate {}
 
-//Render messages
+// Render messages
 extension ChatroomViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return messages.count
