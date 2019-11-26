@@ -1,10 +1,13 @@
 import UIKit
+//TODO - Import Chatkit dependency
 
 class ChatroomViewController: UIViewController {
     
     @IBOutlet weak var messagesTableView: UITableView!
     @IBOutlet weak var textEntry: UITextField!
     
+    //TODO - Class params and inner classes
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -13,9 +16,11 @@ class ChatroomViewController: UIViewController {
         messagesTableView.delegate = self
         messagesTableView.dataSource = self
         
-        //TODO: Init Chatkit
+        //TODO - Init Chatkit
      
-        //TODO: Connect to Chatkit and subscribe to a room
+        //TODO - Connect to Chatkit
+        
+        //TODO - Subscribe to the first room
     }
     
     @IBAction func onSendClicked(_ sender: Any) {
@@ -25,20 +30,18 @@ class ChatroomViewController: UIViewController {
         }
     }
     
-    //TODO: Send a message
+    //TODO - Send a message
     func sendMessage(_ message: String) {
         
     }
     
 }
 
-
-//TODO: Handle incoming message
-
+//TODO - Handle incoming message
 
 extension ChatroomViewController: UITableViewDelegate {}
 
-//TODO: Render messages
+//TODO - Render messages
 extension ChatroomViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 0
