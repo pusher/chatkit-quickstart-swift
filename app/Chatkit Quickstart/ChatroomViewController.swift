@@ -20,7 +20,6 @@ class ChatroomViewController: UIViewController {
      
         //TODO - Connect to Chatkit
         
-        //TODO - Subscribe to the first room
     }
     
     @IBAction func onSendClicked(_ sender: Any) {
@@ -84,15 +83,26 @@ func plistValues(bundle: Bundle) -> (
 
 //Extension for loading an image into an UIImageView from a URL string
 //Inspired by tutorialspoint https://www.tutorialspoint.com/lazy-loading-of-images-in-table-view-using-swift
-extension UIImageView {
+extension UITableViewCell {
     func setImageFromUrl(ImageURL: String, tableview: UITableView) {
+        self.forceSize()
+
         URLSession.shared.dataTask( with: NSURL(string:ImageURL)! as URL, completionHandler: {
             (data, response, error) -> Void in
             DispatchQueue.main.async {
                 if let data = data {
-                    self.image = UIImage(data: data)
+                    self.imageView?.image = UIImage(data: data)
                 }
             }
         }).resume()
+    }
+    
+    private func forceSize(){
+        let itemSize = CGSize.init(width: 50, height: 50)
+        UIGraphicsBeginImageContextWithOptions(itemSize, false, UIScreen.main.scale);
+        let imageRect = CGRect.init(origin: CGPoint.zero, size: itemSize)
+        self.imageView?.image!.draw(in: imageRect)
+        self.imageView?.image! = UIGraphicsGetImageFromCurrentImageContext()!;
+        UIGraphicsEndImageContext();
     }
 }
