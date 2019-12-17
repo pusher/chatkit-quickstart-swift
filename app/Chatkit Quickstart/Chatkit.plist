@@ -10,6 +10,6 @@
         <key>ChatkitRoomId</key>
         <string>alice_and_bob</string>
         <key>ChatkitUserId</key>
-        <string>alice</string>
+        <string>pusher-quick-start-alice</string>
     </dict>
 </plist>
