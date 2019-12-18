@@ -6,7 +6,7 @@
         <key>ChatkitInstanceLocator</key>
         <string>YOUR_INSTANCE_LOCATOR</string>
         <key>ChatkitTokenProviderEndpoint</key>
-        <string>YOUR_TOKEN_PROVIDER_ENDPOINT</string>
+        <string><string>https://YOUR_CLUSTER.pusherplatform.io/services/chatkit_token_provider/v1/YOUR_INSTANCE_ID/token</string></string>
         <key>ChatkitRoomId</key>
         <string>alice_and_bob</string>
         <key>ChatkitUserId</key>
