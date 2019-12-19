@@ -42,5 +42,5 @@ It does the following:
 And can be ran like so:
 
 ```
-❯ sh -c "$(curl -fsSL https://raw.githubusercontent.com/pusher/chatkit-quickstart-swift/start/chatkit-quickstart-install.sh)" YOUR_INSTANCE_LOCATOR
+❯ sh -c "$(curl -fsSL https://raw.githubusercontent.com/pusher/chatkit-quickstart-swift/master/chatkit-quickstart-install.sh)" YOUR_INSTANCE_LOCATOR
 ```
