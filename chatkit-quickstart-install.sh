@@ -26,7 +26,7 @@ setup_color() {
 setup_color
 
 # Set locator from args and extract the cluster and instance ID
-locator=$@
+locator=$0
 array=(${locator//:/ })
 cluster=(${array[1]})
 instanceId=(${array[2]})
