@@ -44,7 +44,7 @@ cat <<-'EOF'
 printf "$RESET"
 
 # Check if instance locator was supplied as argument
-if [ "$#" -ne 1 ]; then
+if [ $0 == v* ]; then
   echo "${RED}${BOLD}Error:${RESET} ${RED}Chatkit instance locator must be supplied${RESET}"
   exit 2
 fi
