@@ -30,3 +30,17 @@ Recent versions of:
 
 User avatar images used in the demo app are made by [Freepik](https://www.freepik.com/home) from www.flaticon.com
 
+## Install script for quick start within dashboard
+
+Within the dashboard we have a quickstart which uses this repo. The shell script is used to get people running quickly.
+It does the following:
+
+- clones the repo
+- installs the dependencies with Cocoapods
+- Injects the credentials, which as passed as an argument
+
+And can be ran like so:
+
+```
+❯ sh -c "$(curl -fsSL https://raw.githubusercontent.com/pusher/chatkit-quickstart-swift/start/chatkit-quickstart-install.sh)" YOUR_INSTANCE_LOCATOR
+```
