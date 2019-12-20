@@ -44,7 +44,8 @@ class ChatroomViewController: UIViewController {
             userID: chatkitInfo.userId
         )
         
-        // Connect to Chatkit by passing in the ChatManagerDelegate you defined at the
+        // Connect to Chatkit by passing in the ChatManagerDelegate you defined at the top of this class.
+        // https://pusher.com/docs/chatkit/reference/swift#connecting
         chatManager!.connect(delegate: MyChatManagerDelegate()) { (currentUser, error) in
             guard(error == nil) else {
                 print("Error connecting: \(error!.localizedDescription)")
