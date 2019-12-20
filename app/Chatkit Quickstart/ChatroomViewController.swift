@@ -1,48 +1,67 @@
 import UIKit
-// Import Chatkit dependency
+
+// Import the Chatkit SDK
 import PusherChatkit
 
+// For this example, you are adding all the Chatkit code to this View Controller.
+// In practice you might split the Chatkit logic across different files.
 class ChatroomViewController: UIViewController {
     
     @IBOutlet weak var messagesTableView: UITableView!
     @IBOutlet weak var textEntry: UITextField!
     
-    // Class params and inner classes
+    // Internal delegate class that listens to Chatkit connection-level events. Passed when initializing Chatkit.
+    // Implement it's methods to listen to different events
+    // https://pusher.com/docs/chatkit/reference/swift#pcchatmanagerdelegate
     class MyChatManagerDelegate: PCChatManagerDelegate {
         func onError(error: Error) {
             print("Error in Chat manager delegate! \(error.localizedDescription)")
         }
     }
     
+    // Chatkit properties
     public var chatManager: ChatManager?
     public var currentUser: PCCurrentUser?
     var messages = [PCMultipartMessage]()
     
     
+    // All initialization happens in this method
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Read the Chatkit instance details from Chatkit.plist
         guard let chatkitInfo = plistValues(bundle: Bundle.main) else { return }
         
         messagesTableView.delegate = self
         messagesTableView.dataSource = self
         
-        // Init Chatkit
+        // Instantiate Chatkit with instance ID, token provider endpoint, and ID of the user you're connecting as.
+        // Initialization: https://pusher.com/docs/chatkit/reference/swift#initialization
+        // Authenticating users and and providing tokens: https://pusher.com/docs/chatkit/reference/swift#pctokenprovider
         self.chatManager = ChatManager(
-            instanceLocator: chatkitInfo.instanceLocator,
-            tokenProvider: PCTokenProvider(url: chatkitInfo.tokenProviderEndpoint),
+            instanceLocator: chatkitInfo.instanceLocator, //Your Chatkit Instance ID
+            tokenProvider: PCTokenProvider(url: chatkitInfo.tokenProviderEndpoint), //Token provider endpoint
             userID: chatkitInfo.userId
         )
         
-        // Connect to Chatkit
+        // Connect to Chatkit by passing in the ChatManagerDelegate you defined at the top of this class.
+        // https://pusher.com/docs/chatkit/reference/swift#connecting
         chatManager!.connect(delegate: MyChatManagerDelegate()) { (currentUser, error) in
             guard(error == nil) else {
                 print("Error connecting: \(error!.localizedDescription)")
                 return
             }
+            
+            // PCCurrentUser is the main entity you interact with in the Chatkit Swfit SDK
+            // You get it in a callback when successfully connected to Chatkit
+            // https://pusher.com/docs/chatkit/reference/swift#pccurrentuser
+            
             self.currentUser = currentUser
             
-            // Subscribe to the first room
+            // Subscribe to the first room for the current user
+            // RoomDelegate with event listeners is implemented below as an extension to this class
+            // https://pusher.com/docs/chatkit/reference/swift#subscribing-to-a-room
+            
             let firstRoom = currentUser!.rooms.first!
             currentUser!.subscribeToRoomMultipart(room: firstRoom, roomDelegate: self, completionHandler: { (error) in
                 guard error == nil else {
@@ -61,8 +80,12 @@ class ChatroomViewController: UIViewController {
         }
     }
     
-    //Send a message
+    //Send a message to Chatkit
     func sendMessage(_ message: String) {
+        
+        // SendSimpleMessage assumes a message with a single inline text part
+        // Send it to the first room of this user
+        // https://pusher.com/docs/chatkit/reference/swift#sending-a-message
         currentUser!.sendSimpleMessage(
             roomID: currentUser!.rooms.first!.id,
             text: message,
@@ -77,14 +100,16 @@ class ChatroomViewController: UIViewController {
         }
         )
     }
-    
 }
 
 
-//Handle incoming message
+// Extension to handle incoming message - PCRoomDelegate
+// https://pusher.com/docs/chatkit/reference/swift#receiving-new-messages
 extension ChatroomViewController: PCRoomDelegate {
     func onMultipartMessage(_ message: PCMultipartMessage) {
         print("Message received!")
+        
+        // Messages are received on a background thread, so you need to use the main thread to display them
         DispatchQueue.main.async {
             self.messages.append(message)
             self.messagesTableView.reloadData()
@@ -95,19 +120,24 @@ extension ChatroomViewController: PCRoomDelegate {
 
 extension ChatroomViewController: UITableViewDelegate {}
 
-// Render messages
+// Render messages in the UITableView
 extension ChatroomViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        // UITableView has as many rows as there are messages in the messages array
         return messages.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MessageCell", for: indexPath)
         
+        // Get a message and fill its details into a cell
+        // https://pusher.com/docs/chatkit/reference/swift#message-properties
         let message = messages[indexPath.row]
         let sender = message.sender
         var messageText = ""
         
+        // Handle a simple message payload that is inline-only
         switch message.parts.first!.payload {
         case .inline(let payload):
             messageText = payload.content
