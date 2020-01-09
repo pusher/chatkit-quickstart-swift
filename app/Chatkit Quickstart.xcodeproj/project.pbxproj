@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,6 +14,8 @@
 		2D8390A522BCD5A6005DB609 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2D8390A322BCD5A6005DB609 /* LaunchScreen.storyboard */; };
 		2DD5541322CCDBC0002CA254 /* ChatroomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DD5541222CCDBC0002CA254 /* ChatroomViewController.swift */; };
 		8CDC2DF53CC309EF8B066A09 /* Pods_Chatkit_Quickstart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C96E546C2609DAB0E2D09D1 /* Pods_Chatkit_Quickstart.framework */; };
+		D39499C223C645BB001BEE59 /* SenderMessageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39499C123C645BB001BEE59 /* SenderMessageTableViewCell.swift */; };
+		D39499C423C645C9001BEE59 /* OthersMessageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39499C323C645C9001BEE59 /* OthersMessageTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,8 @@
 		2D8390A622BCD5A6005DB609 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2DD5541222CCDBC0002CA254 /* ChatroomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatroomViewController.swift; sourceTree = "<group>"; };
 		654142B31ECEFA9FEEBA0F3D /* Pods-Chatkit Quickstart.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chatkit Quickstart.release.xcconfig"; path = "Pods/Target Support Files/Pods-Chatkit Quickstart/Pods-Chatkit Quickstart.release.xcconfig"; sourceTree = "<group>"; };
+		D39499C123C645BB001BEE59 /* SenderMessageTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SenderMessageTableViewCell.swift; sourceTree = "<group>"; };
+		D39499C323C645C9001BEE59 /* OthersMessageTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OthersMessageTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +82,8 @@
 				2D8390A322BCD5A6005DB609 /* LaunchScreen.storyboard */,
 				2D8390A622BCD5A6005DB609 /* Info.plist */,
 				2D2C15652346441300D444C9 /* Chatkit.plist */,
+				D39499C123C645BB001BEE59 /* SenderMessageTableViewCell.swift */,
+				D39499C323C645C9001BEE59 /* OthersMessageTableViewCell.swift */,
 			);
 			path = "Chatkit Quickstart";
 			sourceTree = "<group>";
@@ -167,24 +173,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Chatkit Quickstart/Pods-Chatkit Quickstart-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/PushNotifications/PushNotifications.framework",
-				"${BUILT_PRODUCTS_DIR}/PusherChatkit/PusherChatkit.framework",
-				"${BUILT_PRODUCTS_DIR}/PusherPlatform/PusherPlatform.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-Chatkit Quickstart/Pods-Chatkit Quickstart-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-			);
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PushNotifications.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PusherChatkit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PusherPlatform.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-Chatkit Quickstart/Pods-Chatkit Quickstart-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Chatkit Quickstart/Pods-Chatkit Quickstart-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Chatkit Quickstart/Pods-Chatkit Quickstart-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		3DA6C67AB113607138BE8FC6 /* [CP] Check Pods Manifest.lock */ = {
@@ -216,6 +213,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D39499C423C645C9001BEE59 /* OthersMessageTableViewCell.swift in Sources */,
+				D39499C223C645BB001BEE59 /* SenderMessageTableViewCell.swift in Sources */,
 				2D83909B22BCD5A5005DB609 /* AppDelegate.swift in Sources */,
 				2DD5541322CCDBC0002CA254 /* ChatroomViewController.swift in Sources */,
 			);
