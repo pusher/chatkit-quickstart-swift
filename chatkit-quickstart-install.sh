@@ -57,7 +57,7 @@ git clone git@github.com:pusher/chatkit-quickstart-swift.git
 cd chatkit-quickstart-swift/app
 
 # And switch to master branch which has complete code with comments 
-git checkout master
+git checkout dashboard 
 
 # Install dependencies with Cocapods, if it exists
 echo "${GREEN}${BOLD}📦  Installing dependencies${RESET}"
