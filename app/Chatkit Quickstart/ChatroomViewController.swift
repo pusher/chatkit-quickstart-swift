@@ -88,6 +88,9 @@ extension ChatroomViewController: PCRoomDelegate {
         DispatchQueue.main.async {
             self.messages.append(message)
             self.messagesTableView.reloadData()
+            
+            // scroll to last message
+            self.messagesTableView.scrollToRow(at: IndexPath(row: (self.messages.count - 1), section: 0), at: .bottom, animated: true)
         }
     }
 }
@@ -102,12 +105,10 @@ extension ChatroomViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MessageCell", for: indexPath)
-        
         let message = messages[indexPath.row]
         let sender = message.sender
-        var messageText = ""
         
+       var messageText = ""
         switch message.parts.first!.payload {
         case .inline(let payload):
             messageText = payload.content
@@ -115,13 +116,29 @@ extension ChatroomViewController: UITableViewDataSource {
             print("Message doesn't have the right payload!")
         }
         
-        cell.textLabel?.text = sender.displayName
-        cell.detailTextLabel?.text = messageText
-        if(sender.avatarURL != nil){
-            cell.setImageFromUrl(ImageURL: sender.avatarURL!, tableview: tableView)
+        if (sender.id != currentUser!.id) {
+             // display message is from the other person
+            let cell = tableView.dequeueReusableCell(withIdentifier: "OthersMessageTableViewCell", for: indexPath) as! OthersMessageTableViewCell
+            cell.lblName.text = sender.displayName
+            cell.lblMessage.text = messageText
+            
+            if(sender.avatarURL != nil){
+                cell.setImage(ImageURL: sender.avatarURL!)
+            }
+            
+            return cell
+        } else {
+            // display message is from the other me
+            let cell = tableView.dequeueReusableCell(withIdentifier: "SenderMessageTableViewCell", for: indexPath) as! SenderMessageTableViewCell
+            cell.lblName.text = sender.displayName
+            cell.lblMessage.text = messageText
+            
+            if(sender.avatarURL != nil){
+                cell.setImage(ImageURL: sender.avatarURL!)
+            }
+            
+            return cell
         }
-        
-        return cell
     }
 }
 
@@ -151,31 +168,4 @@ func plistValues(bundle: Bundle) -> (
                 return nil
         }
         return (instanceLocator: instanceLocator, tokenProviderEndpoint: tokenProviderEndpoint, userId: userId, roomId: roomId)
-}
-
-
-//Extension for loading an image into an UIImageView from a URL string
-//Inspired by tutorialspoint https://www.tutorialspoint.com/lazy-loading-of-images-in-table-view-using-swift
-extension UITableViewCell {
-    func setImageFromUrl(ImageURL: String, tableview: UITableView) {
-        self.forceSize()
-
-        URLSession.shared.dataTask( with: NSURL(string:ImageURL)! as URL, completionHandler: {
-            (data, response, error) -> Void in
-            DispatchQueue.main.async {
-                if let data = data {
-                    self.imageView?.image = UIImage(data: data)
-                }
-            }
-        }).resume()
-    }
-    
-    private func forceSize(){
-        let itemSize = CGSize.init(width: 50, height: 50)
-        UIGraphicsBeginImageContextWithOptions(itemSize, false, UIScreen.main.scale);
-        let imageRect = CGRect.init(origin: CGPoint.zero, size: itemSize)
-        self.imageView?.image!.draw(in: imageRect)
-        self.imageView?.image! = UIGraphicsGetImageFromCurrentImageContext()!;
-        UIGraphicsEndImageContext();
-    }
 }
