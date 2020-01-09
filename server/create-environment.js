@@ -5,12 +5,12 @@ async function create() {
 
     const usersToCreate = [
       {
-        id: "alice",
+        id: "pusher-quick-start-alice",
         name: "Alice Antelope",
         avatarURL: "https://imgur.com/km7Gt2P.png"
       },
       {
-        id: "bob",
+        id: "pusher-quick-start-bob",
         name: "Bob Badger",
         avatarURL: "https://imgur.com/KCNNTdA.png"
       }
@@ -26,10 +26,10 @@ async function create() {
     //Creating a room with 2 members
     let room = await chatkit.createRoom({
         id: 'alice_and_bob',
-        creatorId: 'alice',
+        creatorId: 'pusher-quick-start-alice',
         isPrivate: true,
         name: 'Alice A, Bob B',
-        userIds: ['alice', 'bob']
+        userIds: ['pusher-quick-start-alice', 'pusher-quick-start-bob']
     })
 
     console.log(`Created room: ${room.id}`)
@@ -41,48 +41,48 @@ async function create() {
     **/
     await chatkit.sendSimpleMessage({
         roomId: room.id,
-        userId: 'bob',
+        userId: 'pusher-quick-start-bob',
         text: 'What is your quest?',
     })
 
     await chatkit.sendSimpleMessage({
       roomId: room.id,
-      userId: "alice",
+      userId: "pusher-quick-start-alice",
       text:
         "To seek the Holy Grail!"
     })
 
     await chatkit.sendSimpleMessage({
       roomId: room.id,
-      userId: "bob",
+      userId: "pusher-quick-start-bob",
       text:
         "What... is the air-speed velocity of an unladen swallow?"
     })
 
     await chatkit.sendSimpleMessage({
       roomId: room.id,
-      userId: "alice",
+      userId: "pusher-quick-start-alice",
       text:
         "What do you mean? An African or European swallow?"
     })
 
     await chatkit.sendSimpleMessage({
       roomId: room.id,
-      userId: "bob",
+      userId: "pusher-quick-start-bob",
       text:
         "Huh? I-- I don't know that. Auuuuuuuugh!"
     })
 
     await chatkit.sendSimpleMessage({
       roomId: room.id,
-      userId: "bob",
+      userId: "pusher-quick-start-bob",
       text:
         "How do you know so much about swallows?"
     })
 
     await chatkit.sendSimpleMessage({
       roomId: room.id,
-      userId: "alice",
+      userId: "pusher-quick-start-alice",
       text: "Well, you have to know these things when you're a king, you know!"
     })
 
