@@ -49,6 +49,13 @@ if [ $0 == v* ]; then
   exit 2
 fi
 
+# Check if repo exists and abort if so
+if [[ -d chatkit-quickstart-swift ]]
+then
+  echo "${RED}${BOLD}Error:${RESET} ${RED}The directory ${BOLD}chatkit-quickstart-swift${RESET} ${RED}already exists${RESET}"
+  exit 2
+fi
+
 # Clone the repo
 echo "${GREEN}${BOLD}🔍  Cloning the quick start${RESET}"
 git clone git@github.com:pusher/chatkit-quickstart-swift.git
