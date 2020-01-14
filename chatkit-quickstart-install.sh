@@ -58,7 +58,7 @@ fi
 
 # Clone the repo
 echo "${GREEN}${BOLD}🔍  Cloning the quick start${RESET}"
-git clone git@github.com:pusher/chatkit-quickstart-swift.git
+git clone https://github.com/pusher/chatkit-quickstart-swift.git
 
 # Navigate into app
 cd chatkit-quickstart-swift/app
