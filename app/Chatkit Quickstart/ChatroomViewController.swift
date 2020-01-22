@@ -1,5 +1,5 @@
 import UIKit
-// TODO: Import Chatkit SDK
+import PusherChatkit
 
 // In this single-screen app example, all Chatkit initialization is done in this ViewController.
 // In a more complex application, the SDK might be initialized elsewhere and passed to different
@@ -21,7 +21,8 @@ class ChatroomViewController: UIViewController {
     // so that we can adjust as the keyboard appears and disappears
     @IBOutlet weak var bottomOfView: NSLayoutConstraint!
     
-    // TODO: Keep references to the Chatkit SDK objects
+    private var chatManager: ChatManager?
+    private var currentUser: PCCurrentUser?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,8 +40,15 @@ class ChatroomViewController: UIViewController {
         textEntry.delegate = self
         
         messagesTableView.dataSource = self
-        
-        // TODO: Init Chatkit
+
+        // Instantiate Chatkit with instance ID, token provider endpoint, and ID of the user you will connect as.
+        // Initialization: https://pusher.com/docs/chatkit/reference/swift#initialization
+        // Authenticating users and and providing tokens: https://pusher.com/docs/chatkit/reference/swift#pctokenprovider
+        chatManager = ChatManager(
+            instanceLocator: chatkitInfo.instanceLocator,
+            tokenProvider: PCTokenProvider(url: chatkitInfo.tokenProviderEndpoint),
+            userID: chatkitInfo.userId
+        )
      
         // TODO: Connect to Chatkit
     }
