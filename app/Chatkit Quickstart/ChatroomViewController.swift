@@ -72,8 +72,23 @@ class ChatroomViewController: UIViewController {
             // You get it in a callback when successfully connected to Chatkit
             // https://pusher.com/docs/chatkit/reference/swift#pccurrentuser
             self.currentUser = currentUser
-            
-            // TODO: Subscribe to a room
+
+            // We know our user to be in exactly one room, so get it
+            let firstRoom = currentUser!.rooms.first!
+
+            // Subscribe to the first room for the current user.
+            // A RoomDelegate is passed to be notified of events occurring in the room.
+            // This controller is a RoomDelegate, the implementation is in an extension below.
+            // https://pusher.com/docs/chatkit/reference/swift#subscribing-to-a-room
+            currentUser!.subscribeToRoomMultipart(room: firstRoom, 
+                                                  roomDelegate: self, 
+                                                  completionHandler: { (error) in
+                guard error == nil else {
+                    print("Error subscribing to room: \(error!.localizedDescription)")
+                    return
+                }
+                print("Successfully subscribed to the room! 👋")
+            })
         }
     }
     
@@ -147,7 +162,15 @@ class ChatroomViewController: UIViewController {
 
 // MARK: - Incoming message handling delegates
 
-// TODO: Handle incoming message
+// Implementing the PCRoomDelegate protocol allows us to receive notification of events occuring
+// in a room we are subscribed to.
+// https://pusher.com/docs/chatkit/reference/swift#receiving-new-messages
+extension ChatroomViewController: PCRoomDelegate {
+    func onMultipartMessage(_ message: PCMultipartMessage) {
+        print("Message received!")
+        // TODO: Add message to TableView
+    }
+}
 
 extension ChatroomViewController: UITableViewDataSource {
     
