@@ -25,6 +25,9 @@ class ChatroomViewController: UIViewController {
     private var chatManager: ChatManager?
     private var currentUser: PCCurrentUser?
 
+    // The list of messages we have received from Chatkit for this room
+    private var messages = [PCMultipartMessage]()
+
     // Internal delegate class that listens to Chatkit connection-level events. Passed when initializing Chatkit.
     // Implement more methods from the protocol to listen to more types of event.
     // https://pusher.com/docs/chatkit/reference/swift#pcchatmanagerdelegate
@@ -168,21 +171,71 @@ class ChatroomViewController: UIViewController {
 extension ChatroomViewController: PCRoomDelegate {
     func onMultipartMessage(_ message: PCMultipartMessage) {
         print("Message received!")
-        // TODO: Add message to TableView
+        // Events may be received from background queues, so we must dispatch out UI updates
+        // to the main queue
+        DispatchQueue.main.async {
+            // Store the message we received
+            self.messages.append(message)
+            // Tell the table to refresh
+            self.messagesTableView.reloadData()
+            // Tell the table to scroll to the bottom, so that the new message is visible to the user
+            self.messagesTableView.scrollToRow(at: IndexPath(row: self.messages.count-1, section: 0),
+                                               at: UITableView.ScrollPosition.bottom,
+                                               animated: true)
+        }
     }
 }
 
 extension ChatroomViewController: UITableViewDataSource {
     
-    // TODO: Render messages
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        return messages.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "SenderMessageTableViewCell", for: indexPath)
-        return cell
+        // Get a message and fill its details into a cell
+        let message = messages[indexPath.row]
+        let sender = message.sender
+
+        // Handle a simple message payload that is inline-only
+        var messageText = ""
+        
+        switch message.parts.first?.payload {
+        case .inline(let payload):
+            messageText = payload.content
+        default:
+            print("Don't recognise the shape of the message")
+        }
+
+        if (sender.id == currentUser!.id) {
+            // message is from our current user
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: "SenderMessageTableViewCell",
+                for: indexPath) as! SenderMessageTableViewCell
+            
+            cell.lblName.text = sender.displayName
+            cell.lblMessage.text = messageText
+            
+            if (sender.avatarURL != nil) {
+                cell.setImage(ImageURL: sender.avatarURL!)
+            }
+            
+            return cell
+        } else {
+            // message is from the other user in the room
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: "OthersMessageTableViewCell",
+                for: indexPath) as! OthersMessageTableViewCell
+            
+            cell.lblName.text = sender.displayName
+            cell.lblMessage.text = messageText
+            
+            if (sender.avatarURL != nil) {
+                cell.setImage(ImageURL: sender.avatarURL!)
+            }
+            
+            return cell
+        }
     }
 }
 
