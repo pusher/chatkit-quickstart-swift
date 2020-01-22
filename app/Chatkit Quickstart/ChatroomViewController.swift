@@ -107,7 +107,33 @@ class ChatroomViewController: UIViewController {
             return
         }
         
-        // TODO: Send the message
+        // During the sending of a message, we disable the text entry and send button to prevent
+        // multiple submissions of the same message, or losing the message text if the call
+        // to send fails (perhaps we have briefly lost network connectivity)
+        disableMessageSubmission()
+        
+        // sendSimpleMessage is a convenience method for sending messages with only a single
+        // inline text part
+        // https://pusher.com/docs/chatkit/reference/swift#sending-a-message
+        currentUser!.sendSimpleMessage(
+            roomID: currentUser!.rooms.first!.id,
+            text: text,
+            completionHandler: { (messageID, error) in
+                if (error != nil) {
+                    print("Error sending message: \(error!.localizedDescription)")
+                }
+                
+                // The callback comes from another queue, so we must update our UI back on the
+                // main queue
+                DispatchQueue.main.async {
+                    // Re-enable the text entry field and send button.
+                    // If there was no error, we will clear the text entry field.
+                    // If there was an error, we will leave the message in the text entry field
+                    // so that the user can retry.
+                    self.enableMessageSubmission(clearExistingText: error == nil)
+                }
+            }
+        )
     }
     
     // MARK: - Enable and disable message submission
