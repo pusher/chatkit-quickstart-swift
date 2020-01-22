@@ -21,8 +21,18 @@ class ChatroomViewController: UIViewController {
     // so that we can adjust as the keyboard appears and disappears
     @IBOutlet weak var bottomOfView: NSLayoutConstraint!
     
+    // Chatkit properties
     private var chatManager: ChatManager?
     private var currentUser: PCCurrentUser?
+
+    // Internal delegate class that listens to Chatkit connection-level events. Passed when initializing Chatkit.
+    // Implement more methods from the protocol to listen to more types of event.
+    // https://pusher.com/docs/chatkit/reference/swift#pcchatmanagerdelegate
+    class MyChatManagerDelegate: PCChatManagerDelegate {
+        func onError(error: Error) {
+            print("Error in Chat manager delegate! \(error.localizedDescription)")
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,8 +59,22 @@ class ChatroomViewController: UIViewController {
             tokenProvider: PCTokenProvider(url: chatkitInfo.tokenProviderEndpoint),
             userID: chatkitInfo.userId
         )
-     
-        // TODO: Connect to Chatkit
+        
+        // Connect to Chatkit by passing in the ChatManagerDelegate defined at the top of this class.
+        // https://pusher.com/docs/chatkit/reference/swift#connecting
+        chatManager!.connect(delegate: MyChatManagerDelegate()) { (currentUser, error) in
+            guard(error == nil) else {
+                print("Error connecting: \(error!.localizedDescription)")
+                return
+            }
+            
+            // PCCurrentUser is the main entity you interact with from the Chatkit SDK
+            // You get it in a callback when successfully connected to Chatkit
+            // https://pusher.com/docs/chatkit/reference/swift#pccurrentuser
+            self.currentUser = currentUser
+            
+            // TODO: Subscribe to a room
+        }
     }
     
     @IBAction func onSendClicked(_ sender: Any) {
