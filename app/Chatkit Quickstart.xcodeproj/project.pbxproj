@@ -16,6 +16,9 @@
 		8CDC2DF53CC309EF8B066A09 /* Pods_Chatkit_Quickstart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C96E546C2609DAB0E2D09D1 /* Pods_Chatkit_Quickstart.framework */; };
 		D39499C223C645BB001BEE59 /* SenderMessageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39499C123C645BB001BEE59 /* SenderMessageTableViewCell.swift */; };
 		D39499C423C645C9001BEE59 /* OthersMessageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39499C323C645C9001BEE59 /* OthersMessageTableViewCell.swift */; };
+		EDC2042323E34F05001C93B7 /* MessagesDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDC2042223E34F05001C93B7 /* MessagesDataModel.swift */; };
+		EDC2042523E435B5001C93B7 /* MessagesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDC2042423E435B5001C93B7 /* MessagesViewModel.swift */; };
+		EDC2042723E43983001C93B7 /* MessageMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDC2042623E43983001C93B7 /* MessageMapper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +35,9 @@
 		654142B31ECEFA9FEEBA0F3D /* Pods-Chatkit Quickstart.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chatkit Quickstart.release.xcconfig"; path = "Pods/Target Support Files/Pods-Chatkit Quickstart/Pods-Chatkit Quickstart.release.xcconfig"; sourceTree = "<group>"; };
 		D39499C123C645BB001BEE59 /* SenderMessageTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SenderMessageTableViewCell.swift; sourceTree = "<group>"; };
 		D39499C323C645C9001BEE59 /* OthersMessageTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OthersMessageTableViewCell.swift; sourceTree = "<group>"; };
+		EDC2042223E34F05001C93B7 /* MessagesDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesDataModel.swift; sourceTree = "<group>"; };
+		EDC2042423E435B5001C93B7 /* MessagesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewModel.swift; sourceTree = "<group>"; };
+		EDC2042623E43983001C93B7 /* MessageMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageMapper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +90,9 @@
 				2D2C15652346441300D444C9 /* Chatkit.plist */,
 				D39499C123C645BB001BEE59 /* SenderMessageTableViewCell.swift */,
 				D39499C323C645C9001BEE59 /* OthersMessageTableViewCell.swift */,
+				EDC2042223E34F05001C93B7 /* MessagesDataModel.swift */,
+				EDC2042423E435B5001C93B7 /* MessagesViewModel.swift */,
+				EDC2042623E43983001C93B7 /* MessageMapper.swift */,
 			);
 			path = "Chatkit Quickstart";
 			sourceTree = "<group>";
@@ -213,10 +222,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EDC2042523E435B5001C93B7 /* MessagesViewModel.swift in Sources */,
+				EDC2042723E43983001C93B7 /* MessageMapper.swift in Sources */,
 				D39499C423C645C9001BEE59 /* OthersMessageTableViewCell.swift in Sources */,
 				D39499C223C645BB001BEE59 /* SenderMessageTableViewCell.swift in Sources */,
 				2D83909B22BCD5A5005DB609 /* AppDelegate.swift in Sources */,
 				2DD5541322CCDBC0002CA254 /* ChatroomViewController.swift in Sources */,
+				EDC2042323E34F05001C93B7 /* MessagesDataModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

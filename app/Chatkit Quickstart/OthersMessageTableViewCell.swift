@@ -20,6 +20,14 @@ class OthersMessageTableViewCell: UITableViewCell {
         lblMessage.textColor = UIColor(red: 0.19, green: 0.05, blue: 0.31, alpha: 1.0)
     }
     
+}
+
+extension OthersMessageTableViewCell: MessageTableViewCell {
+    func configure(senderName: String, text: String) {
+        lblName.text = senderName
+        lblMessage.text = text
+    }
+    
     func setImage(ImageURL: String) {
         URLSession.shared.dataTask( with: NSURL(string:ImageURL)! as URL, completionHandler: {
             (data, response, error) -> Void in

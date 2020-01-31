@@ -24,9 +24,9 @@ class ChatroomViewController: UIViewController {
     // Chatkit properties
     private var chatManager: ChatManager?
     private var currentUser: PCCurrentUser?
-
-    // The list of messages we have received from Chatkit for this room
-    private var messages = [PCMultipartMessage]()
+    
+    private var dataModel: MessagesDataModel?
+    private var viewModel: MessagesViewModel?
 
     // Internal delegate class that listens to Chatkit connection-level events. Passed when initializing Chatkit.
     // Implement more methods from the protocol to listen to more types of event.
@@ -48,12 +48,16 @@ class ChatroomViewController: UIViewController {
         // We want to adjust out layout when the keyboard shows or hides
         registerForKeyboardNotifications()
         
-        // We want to control whether the text entry is editable, and send messages when the
-        // user hits "return"
+        // We want to trigger a send message action when the user hits "return"
         textEntry.delegate = self
         
-        messagesTableView.dataSource = self
-
+        viewModel = MessagesViewModel()
+        viewModel?.delegate = self
+        
+        messagesTableView.delegate = self
+        messagesTableView.dataSource = viewModel
+        messagesTableView.allowsSelection = true
+        
         // Instantiate Chatkit with instance ID, token provider endpoint, and ID of the user you will connect as.
         // Initialization: https://pusher.com/docs/chatkit/reference/swift#initialization
         // Authenticating users and and providing tokens: https://pusher.com/docs/chatkit/reference/swift#pctokenprovider
@@ -71,35 +75,42 @@ class ChatroomViewController: UIViewController {
                 return
             }
             
-            // PCCurrentUser is the main entity you interact with from the Chatkit SDK
-            // You get it in a callback when successfully connected to Chatkit
-            // https://pusher.com/docs/chatkit/reference/swift#pccurrentuser
-            self.currentUser = currentUser
+            DispatchQueue.main.async {
+                // PCCurrentUser is the main entity you interact with from the Chatkit SDK
+                // You get it in a callback when successfully connected to Chatkit
+                // https://pusher.com/docs/chatkit/reference/swift#pccurrentuser
+                self.currentUser = currentUser
 
-            // We know our user to be in exactly one room, so get it
-            let firstRoom = currentUser!.rooms.first!
+                // We know our user to be in exactly one room, so get it
+                let firstRoom = currentUser!.rooms.first!
 
-            // Subscribe to the first room for the current user.
-            // A RoomDelegate is passed to be notified of events occurring in the room.
-            // This controller is a RoomDelegate, the implementation is in an extension below.
-            // https://pusher.com/docs/chatkit/reference/swift#subscribing-to-a-room
-            currentUser!.subscribeToRoomMultipart(room: firstRoom, 
-                                                  roomDelegate: self, 
-                                                  completionHandler: { (error) in
-                guard error == nil else {
-                    print("Error subscribing to room: \(error!.localizedDescription)")
-                    return
-                }
-                print("Successfully subscribed to the room! 👋")
-            })
+                self.dataModel = MessagesDataModel(currentUserId: currentUser!.id,
+                                                   currentUserName: currentUser!.name,
+                                                   currentUserAvatarUrl: currentUser?.avatarURL)
+                self.dataModel?.delegate = self.viewModel
+
+                // Subscribe to the first room for the current user.
+                // A RoomDelegate is passed to be notified of events occurring in the room.
+                // This controller is a RoomDelegate, the implementation is in an extension below.
+                // https://pusher.com/docs/chatkit/reference/swift#subscribing-to-a-room
+                currentUser!.subscribeToRoomMultipart(room: firstRoom, 
+                                                      roomDelegate: self, 
+                                                      completionHandler: { (error) in
+                    guard error == nil else {
+                        print("Error subscribing to room: \(error!.localizedDescription)")
+                        return
+                    }
+                    print("Successfully subscribed to the room! 👋")
+                })
+            }
         }
     }
     
     @IBAction func onSendClicked(_ sender: Any) {
-        sendMessage()
+        sendFromTextEntry()
     }
     
-    func sendMessage() {
+    func sendFromTextEntry() {
         guard let text = textEntry.text else {
             return
         }
@@ -107,57 +118,31 @@ class ChatroomViewController: UIViewController {
             return
         }
         
-        // During the sending of a message, we disable the text entry and send button to prevent
-        // multiple submissions of the same message, or losing the message text if the call
-        // to send fails (perhaps we have briefly lost network connectivity)
-        disableMessageSubmission()
+        let message = MessageMapper().textToMessage(text)
+        self.textEntry.text = nil
         
-        // sendSimpleMessage is a convenience method for sending messages with only a single
-        // inline text part
-        // https://pusher.com/docs/chatkit/reference/swift#sending-a-message
-        currentUser!.sendSimpleMessage(
+        sendMessage(message: message)
+    }
+    
+    func sendMessage(message: LocalMessage) {
+        dataModel?.addPendingMessage(message)
+        
+        currentUser!.sendMultipartMessage(
             roomID: currentUser!.rooms.first!.id,
-            text: text,
+            parts: message.parts,
             completionHandler: { (messageID, error) in
-                if (error != nil) {
-                    print("Error sending message: \(error!.localizedDescription)")
-                }
-                
                 // The callback comes from another queue, so we must update our UI back on the
                 // main queue
                 DispatchQueue.main.async {
-                    // Re-enable the text entry field and send button.
-                    // If there was no error, we will clear the text entry field.
-                    // If there was an error, we will leave the message in the text entry field
-                    // so that the user can retry.
-                    self.enableMessageSubmission(clearExistingText: error == nil)
+                    if (error != nil) {
+                        print("Error sending message: \(error!.localizedDescription)")
+                        self.dataModel?.pendingMessageFailed(message)
+                    } else {
+                        self.dataModel?.pendingMessageSent(message)
+                    }
                 }
             }
         )
-    }
-    
-    // MARK: - Enable and disable message submission
-    
-    // Controls whether the UITextField delegate allows changing text and pressing return
-    var isMessageSubmissionEnabled = true
-    
-    func disableMessageSubmission() {
-        self.textEntry.backgroundColor = UIColor.lightGray
-        self.isMessageSubmissionEnabled = false
-        
-        self.sendButton.isHidden = true
-        self.sendingIndicator.startAnimating()
-    }
-    
-    func enableMessageSubmission(clearExistingText: Bool) {
-        if clearExistingText {
-            self.textEntry.text = nil
-        }
-        self.textEntry.backgroundColor = nil
-        self.isMessageSubmissionEnabled = true
-        
-        self.sendButton.isHidden = false
-        self.sendingIndicator.stopAnimating()
     }
     
     // MARK: - Handle keyboard show/hide
@@ -200,83 +185,96 @@ extension ChatroomViewController: PCRoomDelegate {
         // Events may be received from background queues, so we must dispatch out UI updates
         // to the main queue
         DispatchQueue.main.async {
-            // Store the message we received
-            self.messages.append(message)
-            // Tell the table to refresh
-            self.messagesTableView.reloadData()
-            // Tell the table to scroll to the bottom, so that the new message is visible to the user
-            self.messagesTableView.scrollToRow(at: IndexPath(row: self.messages.count-1, section: 0),
-                                               at: UITableView.ScrollPosition.bottom,
-                                               animated: true)
+            self.dataModel?.addMessageFromServer(message)
         }
     }
 }
 
-extension ChatroomViewController: UITableViewDataSource {
-    
+extension MessagesViewModel: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messages.count
+        print("Number of rows requested")
+        return items.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // Get a message and fill its details into a cell
-        let message = messages[indexPath.row]
-        let sender = message.sender
-
-        // Handle a simple message payload that is inline-only
-        var messageText = ""
+        let message = items[indexPath.row]
+        let cell: MessageTableViewCell
+        switch (message.viewType) {
+        case .pending:
+            let senderCell = tableView.dequeueReusableCell(withIdentifier: "SenderMessageTableViewCell",
+                                                           for: indexPath) as! SenderMessageTableViewCell
+            
+            senderCell.setBg(color: UIColor.lightGray)
+            cell = senderCell
+        case .failed:
+            let senderCell = tableView.dequeueReusableCell(withIdentifier: "SenderMessageTableViewCell",
+                                                           for: indexPath) as! SenderMessageTableViewCell
+            
+            senderCell.setBg(color: UIColor.systemPink)
+            cell = senderCell
+        case .fromMe:
+            let senderCell = tableView.dequeueReusableCell(withIdentifier: "SenderMessageTableViewCell",
+                                                           for: indexPath) as! SenderMessageTableViewCell
+            
+            senderCell.setBg(color: UIColor(red: 0.19, green: 0.05, blue: 0.31, alpha: 1.0))
+            cell = senderCell
+        case .fromOther: 
+            cell = tableView.dequeueReusableCell(withIdentifier: "OthersMessageTableViewCell",
+                                                 for: indexPath) as! OthersMessageTableViewCell
+        }
         
-        switch message.parts.first?.payload {
-        case .inline(let payload):
-            messageText = payload.content
-        default:
-            print("Don't recognise the shape of the message")
+        cell.configure(senderName: message.senderName, text: message.text)
+        
+        if (message.senderAvatarUrl != nil) {
+            cell.setImage(ImageURL: message.senderAvatarUrl!)
         }
-
-        if (sender.id == currentUser!.id) {
-            // message is from our current user
-            let cell = tableView.dequeueReusableCell(
-                withIdentifier: "SenderMessageTableViewCell",
-                for: indexPath) as! SenderMessageTableViewCell
-            
-            cell.lblName.text = sender.displayName
-            cell.lblMessage.text = messageText
-            
-            if (sender.avatarURL != nil) {
-                cell.setImage(ImageURL: sender.avatarURL!)
-            }
-            
-            return cell
-        } else {
-            // message is from the other user in the room
-            let cell = tableView.dequeueReusableCell(
-                withIdentifier: "OthersMessageTableViewCell",
-                for: indexPath) as! OthersMessageTableViewCell
-            
-            cell.lblName.text = sender.displayName
-            cell.lblMessage.text = messageText
-            
-            if (sender.avatarURL != nil) {
-                cell.setImage(ImageURL: sender.avatarURL!)
-            }
-            
-            return cell
-        }
+        
+        return cell
     }
 }
 
-// MARK: - TextField delegate (Enable and disable message submission)
+extension ChatroomViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        print("didSelectRowAt: \(indexPath.row)")
+        let item = self.dataModel?.itemAt(index: indexPath.row)
+        if case .local(let message, .failed) = item {
+            sendMessage(message: message)
+        }
+        
+        // Don't actually select the row
+        return nil
+    }
+}
+
+protocol MessageTableViewCell: UITableViewCell {
+    func configure(senderName: String, text: String)
+    func setImage(ImageURL: String)
+}
+
+// MARK: - TextField delegate (send on enter keypress)
 
 extension ChatroomViewController: UITextFieldDelegate {
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        return self.isMessageSubmissionEnabled
-    }
-    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if (self.isMessageSubmissionEnabled) {
-            self.sendMessage()
-        }
+        self.sendFromTextEntry()
         return false
+    }
+}
+
+extension MessagesViewModel: MessagesDataModelDelegate {
+    func didChange(model: MessagesDataModel.MessagesModel, changeType: ChangeType) {
+        print("Data model updated")
+        self.update(model: model, change: changeType)
+    }
+}
+
+extension ChatroomViewController: MessagesViewModelDelegate {
+    func didUpdate(model: [MessagesViewModel.MessageView], change: ChangeType) {
+        print("View model updated")
+        self.messagesTableView.reloadData()
+        if case let .itemAdded(index) = change {
+            self.messagesTableView.scrollToRow(at: IndexPath(row: index, section: 0), at: .bottom, animated: true)
+        }
     }
 }
 

@@ -20,6 +20,17 @@ class SenderMessageTableViewCell: UITableViewCell {
         lblMessage.textColor = UIColor.white
     }
     
+    func setBg(color: UIColor) {
+        imgBackground.backgroundColor = color
+    }
+}
+
+extension SenderMessageTableViewCell: MessageTableViewCell {
+    func configure(senderName: String, text: String) {
+        lblName.text = senderName
+        lblMessage.text = text
+    }
+    
     func setImage(ImageURL: String) {
         URLSession.shared.dataTask( with: NSURL(string:ImageURL)! as URL, completionHandler: {
             (data, response, error) -> Void in
@@ -30,5 +41,4 @@ class SenderMessageTableViewCell: UITableViewCell {
             }
         }).resume()
     }
-
 }
