@@ -1,11 +1,3 @@
-//
-//  MessagesDataModel.swift
-//  Chatkit Quickstart
-//
-//  Created by Mike Pye on 30/01/2020.
-//  Copyright © 2020 Pusher. All rights reserved.
-//
-
 import Foundation
 import PusherChatkit
 
@@ -57,7 +49,8 @@ extension PCMultipartMessage {
 }
 
 protocol MessagesDataModelDelegate {
-    func didChange(model: MessagesDataModel.MessagesModel, changeType: ChangeType)
+    func messagesDataModel(_ messagesDataModel: MessagesDataModel, didUpdateModel messagesModel: MessagesDataModel.MessagesModel, addingMessageAt index: Int)
+    func messagesDataModel(_ messagesDataModel: MessagesDataModel, didUpdateModel messagesModel: MessagesDataModel.MessagesModel, updatingMessageAt index: Int)
 }
 
 class MessagesDataModel {
@@ -139,20 +132,28 @@ class MessagesDataModel {
     
     private func addItem(_ item: MessageItem) {
         items.append(item)
-        delegate?.didChange(model: MessagesModel(currentUserId: currentUserId,
-                                                currentUserName: currentUserName, 
-                                                currentUserAvatarUrl: currentUserAvatarUrl, 
-                                                items: items),
-                           changeType: ChangeType.itemAdded(index: items.count-1))
+        
+        let messagesModel = MessagesModel(currentUserId: currentUserId,
+                                          currentUserName: currentUserName,
+                                          currentUserAvatarUrl: currentUserAvatarUrl,
+                                          items: items)
+        
+        delegate?.messagesDataModel(self,
+                                    didAddMessagesModel: messagesModel,
+                                    atIndex: items.count - 1)
     }
 
     private func replaceItem(_ item: MessageItem, index: Int) {
         items[index] = item
-        delegate?.didChange(model: MessagesModel(currentUserId: currentUserId,
-                                                currentUserName: currentUserName, 
-                                                currentUserAvatarUrl: currentUserAvatarUrl, 
-                                                items: items),
-                           changeType: ChangeType.itemUpdated(index: index))
+        
+        let messagesModel = MessagesModel(currentUserId: currentUserId,
+                                          currentUserName: currentUserName,
+                                          currentUserAvatarUrl: currentUserAvatarUrl,
+                                          items: items)
+        
+        delegate?.messagesDataModel(self,
+                                    didUpdateMessagesModel: messagesModel,
+                                    atIndex: index)
     }
 
     private func findItemIndexByInternalId(_ internalId: String?) -> Int? {

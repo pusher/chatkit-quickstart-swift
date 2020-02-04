@@ -271,21 +271,19 @@ extension ChatroomViewController: UITextFieldDelegate {
     }
 }
 
-extension MessagesViewModel: MessagesDataModelDelegate {
-    func didChange(model: MessagesDataModel.MessagesModel, changeType: ChangeType) {
-        print("Data model updated")
-        self.update(model: model, change: changeType)
-    }
-}
-
 extension ChatroomViewController: MessagesViewModelDelegate {
-    func didUpdate(model: [MessagesViewModel.MessageView], change: ChangeType) {
-        print("View model updated")
+    
+    func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateModel: [MessagesViewModel.MessageView], addingMessageAt index: Int) {
+        print("View model updated (message added at index: \(index)")
         self.messagesTableView.reloadData()
-        if case let .itemAdded(index) = change {
-            self.messagesTableView.scrollToRow(at: IndexPath(row: index, section: 0), at: .bottom, animated: true)
-        }
+        self.messagesTableView.scrollToRow(at: IndexPath(row: index, section: 0), at: .bottom, animated: true)
     }
+    
+    func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateModel: [MessagesViewModel.MessageView], updatingMessageAt index: Int) {
+        print("View model updated (message updated at index: \(index))")
+        self.messagesTableView.reloadData()
+    }
+
 }
 
 // MARK: - Property list parsing

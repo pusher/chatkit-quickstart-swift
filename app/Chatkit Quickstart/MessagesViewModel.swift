@@ -1,15 +1,8 @@
-//
-//  MessagesViewModel.swift
-//  Chatkit Quickstart
-//
-//  Created by Mike Pye on 31/01/2020.
-//  Copyright © 2020 Pusher. All rights reserved.
-//
-
 import Foundation
 
 protocol MessagesViewModelDelegate {
-    func didUpdate(model: [MessagesViewModel.MessageView], change: ChangeType)
+    func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateModel: [MessagesViewModel.MessageView], updatingMessageAt index: Int)
+    func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateModel: [MessagesViewModel.MessageView], addingMessageAt index: Int)
 }
 
 class MessagesViewModel: NSObject {
@@ -31,9 +24,10 @@ class MessagesViewModel: NSObject {
     private(set) var items = [MessageView]()
     
     var delegate: MessagesViewModelDelegate?
-    
-    func update(model: MessagesDataModel.MessagesModel, change: ChangeType) {
-        let newItems = model.items.map { (item: MessagesDataModel.MessageItem) -> MessageView in 
+
+    private func updateItems(with model: MessagesDataModel.MessagesModel) {
+
+        self.items = model.items.map { (item: MessagesDataModel.MessageItem) -> MessageView in
             let senderName: String
             let senderAvatarUrl: String?
             let text: String
@@ -65,8 +59,24 @@ class MessagesViewModel: NSObject {
                                text: text,
                                viewType: viewType)
         }
+    }
+}
+
+extension MessagesViewModel: MessagesDataModelDelegate {
+    
+    func messagesDataModel(_ messagesDataModel: MessagesDataModel, didUpdateModel messagesModel: MessagesDataModel.MessagesModel, addingMessageAt index: Int) {
+        print("Data model updated")
         
-        self.items = newItems
-        delegate?.didUpdate(model: newItems, change: change)
+        updateItems(with: messagesModel)
+        
+        delegate?.messagesViewModel(self, didUpdateModel: items, addingMessageAt: index)
+    }
+    
+    func messagesDataModel(_ messagesDataModel: MessagesDataModel, didUpdateModel messagesModel: MessagesDataModel.MessagesModel, updatingMessageAt index: Int) {
+        print("Data model updated")
+        
+        updateItems(with: messagesModel)
+        
+        delegate?.messagesViewModel(self, didUpdateModel: items, updatingMessageAt: index)
     }
 }
