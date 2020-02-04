@@ -25,7 +25,7 @@ class ChatroomViewController: UIViewController {
     private var chatManager: ChatManager?
     private var currentUser: PCCurrentUser?
     
-    private var dataModel: MessagesDataModel?
+    private var store: MessagesStore?
     private var viewModel: MessagesViewModel?
 
     // Internal delegate class that listens to Chatkit connection-level events. Passed when initializing Chatkit.
@@ -92,10 +92,10 @@ class ChatroomViewController: UIViewController {
                 // https://pusher.com/docs/chatkit/reference/swift#pccurrentuser
                 self.currentUser = currentUser
 
-                self.dataModel = MessagesDataModel(currentUserId: currentUser.id,
-                                                   currentUserName: currentUser.name,
-                                                   currentUserAvatarUrl: currentUser.avatarURL)
-                self.dataModel?.delegate = self.viewModel
+            self.store = MessagesStore(currentUserId: currentUser.id,
+                                       currentUserName: currentUser.name,
+                                       currentUserAvatarUrl: currentUser.avatarURL)
+            self.store?.delegate = self.viewModel
 
                 // Subscribe to the first room for the current user.
                 // A RoomDelegate is passed to be notified of events occurring in the room.
@@ -134,7 +134,7 @@ class ChatroomViewController: UIViewController {
             return
         }
         
-        dataModel?.addPendingMessage(message)
+        store?.addPendingMessage(message)
         
         currentUser.sendMultipartMessage(roomID: firstRoom.id, parts: message.parts) { (_, error) in
             // The callback comes from another queue, so we must update our UI back on the
@@ -142,9 +142,9 @@ class ChatroomViewController: UIViewController {
             DispatchQueue.main.async {
                 if let error = error {
                     print("Error sending message: \(error.localizedDescription)")
-                    self.dataModel?.pendingMessageFailed(message)
+                    self.store?.pendingMessageFailed(message)
                 } else {
-                    self.dataModel?.pendingMessageSent(message)
+                    self.store?.pendingMessageSent(message)
                 }
             }
         }
@@ -193,7 +193,7 @@ extension ChatroomViewController: PCRoomDelegate {
         // Events may be received from background queues, so we must dispatch out UI updates
         // to the main queue
         DispatchQueue.main.async {
-            self.dataModel?.addMessageFromServer(message)
+            self.store?.addMessageFromServer(message)
         }
     }
 }
@@ -207,12 +207,12 @@ extension MessagesViewModel: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // Get a message and fill its details into a cell
-        let message = items[indexPath.row]
+        let messageViewItem = items[indexPath.row]
         
         let cellType: MessageTableViewCell.Type
         let backgroundColor: UIColor
         
-        switch (message.viewType) {
+        switch (messageViewItem.viewType) {
         case .pending:
             cellType = SenderMessageTableViewCell.self
             backgroundColor = .lightGray
@@ -230,9 +230,9 @@ extension MessagesViewModel: UITableViewDataSource {
         let cellIdentifier = String(describing: cellType)
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) as! MessageTableViewCell
 
-        cell.configure(senderName: message.senderName,
-                       senderAvatarUrl: message.senderAvatarUrl,
-                       text: message.text,
+        cell.configure(senderName: messageViewItem.senderName,
+                       senderAvatarUrl: messageViewItem.senderAvatarUrl,
+                       text: messageViewItem.text,
                        backgroundColor: backgroundColor)
         return cell
     }
@@ -244,15 +244,14 @@ extension ChatroomViewController: UITableViewDelegate {
         
         print("didSelectRowAt: \(indexPath.row)")
         
-        guard let item = self.dataModel?.item(at: indexPath.row),
+        guard let item = self.store?.item(at: indexPath.row),
             case .local(let message, .failed) = item else {
-            return nil
+            return nil // Return nil so the row is not actually selected
         }
         
         sendMessage(message: message)
         
-        // Don't actually select the row
-        return nil
+        return nil // Return nil so the row is not actually selected
     }
 }
 
@@ -277,13 +276,13 @@ extension ChatroomViewController: UITextFieldDelegate {
 
 extension ChatroomViewController: MessagesViewModelDelegate {
     
-    func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateModel: [MessagesViewModel.MessageView], addingMessageAt index: Int) {
+    func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateItems: [MessageViewItem], addingMessageAt index: Int) {
         print("View model updated (message added at index: \(index)")
         self.messagesTableView.reloadData()
         self.messagesTableView.scrollToRow(at: IndexPath(row: index, section: 0), at: .bottom, animated: true)
     }
     
-    func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateModel: [MessagesViewModel.MessageView], updatingMessageAt index: Int) {
+    func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateItems: [MessageViewItem], updatingMessageAt index: Int) {
         print("View model updated (message updated at index: \(index))")
         self.messagesTableView.reloadData()
     }
