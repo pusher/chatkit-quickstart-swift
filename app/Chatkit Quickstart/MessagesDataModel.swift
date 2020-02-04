@@ -139,8 +139,8 @@ class MessagesDataModel {
                                           items: items)
         
         delegate?.messagesDataModel(self,
-                                    didAddMessagesModel: messagesModel,
-                                    atIndex: items.count - 1)
+                                    didUpdateModel: messagesModel,
+                                    addingMessageAt: items.count - 1)
     }
 
     private func replaceItem(_ item: MessageItem, index: Int) {
@@ -152,8 +152,8 @@ class MessagesDataModel {
                                           items: items)
         
         delegate?.messagesDataModel(self,
-                                    didUpdateMessagesModel: messagesModel,
-                                    atIndex: index)
+                                    didUpdateModel: messagesModel,
+                                    updatingMessageAt: index)
     }
 
     private func findItemIndexByInternalId(_ internalId: String?) -> Int? {
