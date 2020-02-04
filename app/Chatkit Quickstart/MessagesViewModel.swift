@@ -8,7 +8,12 @@
 
 import Foundation
 
+protocol MessagesViewModelDelegate {
+    func didUpdate(model: [MessagesViewModel.MessageView], change: ChangeType)
+}
+
 class MessagesViewModel: NSObject {
+    
     enum ViewType {
         case pending
         case failed
@@ -23,7 +28,7 @@ class MessagesViewModel: NSObject {
         let viewType: ViewType
     }
     
-    internal var items = [MessageView]()
+    private(set) var items = [MessageView]()
     
     var delegate: MessagesViewModelDelegate?
     
@@ -36,18 +41,15 @@ class MessagesViewModel: NSObject {
             
             switch (item) {
             case MessagesDataModel.MessageItem.fromServer(let message):
-                senderName = message.sender.name == nil ? "Anonymous User" : message.sender.name!
+                senderName = message.sender.name ?? "Anonymous User"
                 senderAvatarUrl = message.sender.avatarURL
-                let maybeText = MessageMapper().messageToText(message)
-                text = maybeText == nil ? "" : maybeText!
+                text = message.text
                 viewType = message.sender.id == model.currentUserId ? .fromMe : .fromOther
-                
+            
             case MessagesDataModel.MessageItem.local(let message, let state):
-                senderName = model.currentUserName == nil ? "Anonymous User" : model.currentUserName!
+                senderName = model.currentUserName ?? "Anonymous User"
                 senderAvatarUrl = model.currentUserAvatarUrl
-                let maybeText = MessageMapper().messageToText(message)
-                text = maybeText == nil ? "" : maybeText!
-
+                text = message.text
                 switch (state) {
                 case .pending: 
                     viewType = .pending
@@ -59,17 +61,12 @@ class MessagesViewModel: NSObject {
             }
             
             return MessageView(senderName: senderName,
-                        senderAvatarUrl: senderAvatarUrl,
-                        text: text,
-                        viewType: viewType)
-            
+                               senderAvatarUrl: senderAvatarUrl,
+                               text: text,
+                               viewType: viewType)
         }
         
         self.items = newItems
         delegate?.didUpdate(model: newItems, change: change)
     }
-}
-
-protocol MessagesViewModelDelegate {
-    func didUpdate(model: [MessagesViewModel.MessageView], change: ChangeType)
 }

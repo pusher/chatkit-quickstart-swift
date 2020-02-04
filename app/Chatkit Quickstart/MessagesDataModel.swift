@@ -9,6 +9,9 @@
 import Foundation
 import PusherChatkit
 
+private let MIME_TYPE_INTERNAL_ID = "com-pusher-gettingstarted/internal-id"
+private let MIME_TYPE_TEXT = "text/plain"
+
 enum ChangeType {
     case itemAdded(index: Int)
     case itemUpdated(index: Int)
@@ -18,14 +21,43 @@ struct LocalMessage {
     let text: String
     let internalId: String
     
-    var parts: [PCPartRequest] {
-        get {
-            return [
-                PCPartRequest(.inline(PCPartInlineRequest(type: MIME_TYPE_TEXT, content: text))),
-                PCPartRequest(.inline(PCPartInlineRequest(type: MIME_TYPE_INTERNAL_ID, content: internalId)))            
-            ]
-        }
+    init(text: String) {
+        self.text = text
+        self.internalId = UUID().uuidString
     }
+    
+    var parts: [PCPartRequest] {
+        return [
+            PCPartRequest(.inline(PCPartInlineRequest(type: MIME_TYPE_TEXT, content: text))),
+            PCPartRequest(.inline(PCPartInlineRequest(type: MIME_TYPE_INTERNAL_ID, content: internalId)))
+        ]
+    }
+}
+
+extension PCMultipartMessage {
+    
+    var internalId: String? {
+        return part(forType: MIME_TYPE_INTERNAL_ID)
+    }
+    
+    var text: String {
+        return part(forType: MIME_TYPE_TEXT) ?? ""
+    }
+    
+    private func part(forType type: String) -> String? {
+        for part in parts {
+            if case .inline(let payload) = part.payload {
+                if payload.type == type {
+                    return payload.content
+                }
+            }
+        }
+        return nil
+    }
+}
+
+protocol MessagesDataModelDelegate {
+    func didChange(model: MessagesDataModel.MessagesModel, changeType: ChangeType)
 }
 
 class MessagesDataModel {
@@ -39,17 +71,6 @@ class MessagesDataModel {
     enum MessageItem {
         case fromServer(_ message: PCMultipartMessage)
         case local(_ message: LocalMessage, state: LocalMessageState)
-        
-        var internalId: String? { 
-            get {
-                switch (self) {
-                    case .fromServer(let message):
-                        return MessageMapper().messageToInternalId(message)
-                    case .local(let message, _):
-                        return MessageMapper().messageToInternalId(message)
-                }
-            }
-        }
     }
     
     struct MessagesModel {
@@ -59,7 +80,7 @@ class MessagesDataModel {
         let items: [MessageItem]
     }
     
-    public var delegate: MessagesDataModelDelegate?
+    var delegate: MessagesDataModelDelegate?
     
     private let currentUserId: String
     private let currentUserName: String?
@@ -67,14 +88,14 @@ class MessagesDataModel {
 
     private var items: [MessageItem] = []
 
-    public init(currentUserId: String, currentUserName: String?, currentUserAvatarUrl: String?) {
+    init(currentUserId: String, currentUserName: String?, currentUserAvatarUrl: String?) {
         self.currentUserId = currentUserId
         self.currentUserName = currentUserName
         self.currentUserAvatarUrl = currentUserAvatarUrl
     }
     
-    public func itemAt(index: Int) -> MessageItem {
-        return items[index]
+    func item(at index: Int) -> MessageItem? {
+        return items.count > index ? items[index] : nil
     }
     
     func addMessageFromServer(_ message: PCMultipartMessage) {
@@ -95,27 +116,23 @@ class MessagesDataModel {
 
     private func addOrUpdateItem(_ item: MessageItem) {
         switch (item) {
-        case .fromServer:
+        case let .fromServer(message):
             // A message from the server is canonical, and will always replace a local message
             // with the same internalId
-            let index = findItemIndexByInternalId(item.internalId)
-
-            if (index == nil) {
+            if let index = findItemIndexByInternalId(message.internalId) {
+                replaceItem(item, index: index)
+            } else {
                 addItem(item)
-            } else {                                                                                                                                                                    
-                replaceItem(item, index: index!)
             }
-        case .local:
+        case let .local(message, _):
             // We may update the state of local messages, but we should never overwrite that of
             // a FromServer message
-            let index = findItemIndexByInternalId(item.internalId)
-
-            if (index == nil) {
-                addItem(item)
-            } else {
-                if case MessageItem.local(_, state: _) = items[index!] {
-                    replaceItem(item, index: index!)
+            if let index = findItemIndexByInternalId(message.internalId) {
+                if case MessageItem.local = items[index] {
+                    replaceItem(item, index: index)
                 }
+            } else {
+                addItem(item)
             }
         }
     }
@@ -141,15 +158,11 @@ class MessagesDataModel {
     private func findItemIndexByInternalId(_ internalId: String?) -> Int? {
         items.lastIndex { (item) in
             switch (item) {
-            case .fromServer:
-                return item.internalId != nil && item.internalId == internalId
-            case .local:
-                return item.internalId != nil && item.internalId == internalId
+            case let .fromServer (message):
+                return message.internalId != nil && message.internalId == internalId
+            case let .local(message, _):
+                return message.internalId == internalId
             }
         }
     }
-}
-
-protocol MessagesDataModelDelegate {
-    func didChange(model: MessagesDataModel.MessagesModel, changeType: ChangeType)
 }

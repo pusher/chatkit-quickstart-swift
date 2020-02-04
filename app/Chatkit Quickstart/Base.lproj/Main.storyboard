@@ -72,10 +72,10 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="imgAvatar" destination="0fz-rG-TQB" id="Elg-Tn-oih"/>
-                                            <outlet property="imgBackground" destination="bsE-tI-tsN" id="jIW-Wg-DSz"/>
-                                            <outlet property="lblMessage" destination="tFi-G8-5ey" id="aRO-Im-8jM"/>
-                                            <outlet property="lblName" destination="elU-Gg-Qxi" id="P9A-n7-Vss"/>
+                                            <outlet property="avatarImageView" destination="0fz-rG-TQB" id="Elg-Tn-oih"/>
+                                            <outlet property="backgroundImageView" destination="bsE-tI-tsN" id="jIW-Wg-DSz"/>
+                                            <outlet property="messageLabel" destination="tFi-G8-5ey" id="aRO-Im-8jM"/>
+                                            <outlet property="nameLabel" destination="elU-Gg-Qxi" id="P9A-n7-Vss"/>
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="SenderMessageTableViewCell" rowHeight="110" id="Ejz-Nt-eL8" customClass="SenderMessageTableViewCell" customModule="Chatkit_Quickstart" customModuleProvider="target">
@@ -129,10 +129,10 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="imgAvatar" destination="BZx-zS-jFm" id="P02-fb-Ha6"/>
-                                            <outlet property="imgBackground" destination="4fz-Q9-DHs" id="rpD-DE-tXt"/>
-                                            <outlet property="lblMessage" destination="Q91-Xu-hNP" id="8SG-Tm-iwx"/>
-                                            <outlet property="lblName" destination="YzX-KV-YKv" id="OW5-HT-Msj"/>
+                                            <outlet property="avatarImageView" destination="BZx-zS-jFm" id="P02-fb-Ha6"/>
+                                            <outlet property="backgroundImageView" destination="4fz-Q9-DHs" id="rpD-DE-tXt"/>
+                                            <outlet property="messageLabel" destination="Q91-Xu-hNP" id="8SG-Tm-iwx"/>
+                                            <outlet property="nameLabel" destination="YzX-KV-YKv" id="OW5-HT-Msj"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -239,10 +239,10 @@
                         </constraints>
                     </tableViewCellContentView>
                     <connections>
-                        <outlet property="imgAvatar" destination="TBU-i4-10s" id="AYS-Ls-v7Z"/>
-                        <outlet property="imgBackground" destination="9BP-kw-Ksl" id="TuI-dY-MLN"/>
-                        <outlet property="lblMessage" destination="Vb1-1n-Xg4" id="Xsf-07-kUL"/>
-                        <outlet property="lblName" destination="5fR-UO-Wxn" id="YBu-JC-bvG"/>
+                        <outlet property="avatarImageView" destination="TBU-i4-10s" id="AYS-Ls-v7Z"/>
+                        <outlet property="backgroundImageView" destination="9BP-kw-Ksl" id="TuI-dY-MLN"/>
+                        <outlet property="messageLabel" destination="Vb1-1n-Xg4" id="Xsf-07-kUL"/>
+                        <outlet property="nameLabel" destination="5fR-UO-Wxn" id="YBu-JC-bvG"/>
                     </connections>
                 </tableViewCell>
             </objects>

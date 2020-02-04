@@ -18,7 +18,6 @@
 		D39499C423C645C9001BEE59 /* OthersMessageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39499C323C645C9001BEE59 /* OthersMessageTableViewCell.swift */; };
 		EDC2042323E34F05001C93B7 /* MessagesDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDC2042223E34F05001C93B7 /* MessagesDataModel.swift */; };
 		EDC2042523E435B5001C93B7 /* MessagesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDC2042423E435B5001C93B7 /* MessagesViewModel.swift */; };
-		EDC2042723E43983001C93B7 /* MessageMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDC2042623E43983001C93B7 /* MessageMapper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,7 +36,6 @@
 		D39499C323C645C9001BEE59 /* OthersMessageTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OthersMessageTableViewCell.swift; sourceTree = "<group>"; };
 		EDC2042223E34F05001C93B7 /* MessagesDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesDataModel.swift; sourceTree = "<group>"; };
 		EDC2042423E435B5001C93B7 /* MessagesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewModel.swift; sourceTree = "<group>"; };
-		EDC2042623E43983001C93B7 /* MessageMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageMapper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,7 +90,6 @@
 				D39499C323C645C9001BEE59 /* OthersMessageTableViewCell.swift */,
 				EDC2042223E34F05001C93B7 /* MessagesDataModel.swift */,
 				EDC2042423E435B5001C93B7 /* MessagesViewModel.swift */,
-				EDC2042623E43983001C93B7 /* MessageMapper.swift */,
 			);
 			path = "Chatkit Quickstart";
 			sourceTree = "<group>";
@@ -223,7 +220,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EDC2042523E435B5001C93B7 /* MessagesViewModel.swift in Sources */,
-				EDC2042723E43983001C93B7 /* MessageMapper.swift in Sources */,
 				D39499C423C645C9001BEE59 /* OthersMessageTableViewCell.swift in Sources */,
 				D39499C223C645BB001BEE59 /* SenderMessageTableViewCell.swift in Sources */,
 				2D83909B22BCD5A5005DB609 /* AppDelegate.swift in Sources */,

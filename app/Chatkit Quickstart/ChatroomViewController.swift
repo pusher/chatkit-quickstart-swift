@@ -31,7 +31,7 @@ class ChatroomViewController: UIViewController {
     // Internal delegate class that listens to Chatkit connection-level events. Passed when initializing Chatkit.
     // Implement more methods from the protocol to listen to more types of event.
     // https://pusher.com/docs/chatkit/reference/swift#pcchatmanagerdelegate
-    class MyChatManagerDelegate: PCChatManagerDelegate {
+    class ChatManagerDelegate: PCChatManagerDelegate {
         func onError(error: Error) {
             print("Error in Chat manager delegate! \(error.localizedDescription)")
         }
@@ -40,10 +40,6 @@ class ChatroomViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Load Chatkit instance details from the plist file
-        guard let chatkitInfo = plistValues(bundle: Bundle.main) else {
-            return
-        }
         
         // We want to adjust out layout when the keyboard shows or hides
         registerForKeyboardNotifications()
@@ -58,96 +54,101 @@ class ChatroomViewController: UIViewController {
         messagesTableView.dataSource = viewModel
         messagesTableView.allowsSelection = true
         
+        // Load Chatkit instance details from the plist file
+        let chatkitInfo = plistValues(bundle: Bundle.main)
+        
         // Instantiate Chatkit with instance ID, token provider endpoint, and ID of the user you will connect as.
         // Initialization: https://pusher.com/docs/chatkit/reference/swift#initialization
         // Authenticating users and and providing tokens: https://pusher.com/docs/chatkit/reference/swift#pctokenprovider
-        chatManager = ChatManager(
+        let chatManager = ChatManager(
             instanceLocator: chatkitInfo.instanceLocator,
             tokenProvider: PCTokenProvider(url: chatkitInfo.tokenProviderEndpoint),
             userID: chatkitInfo.userId
         )
+        self.chatManager = chatManager
         
         // Connect to Chatkit by passing in the ChatManagerDelegate defined at the top of this class.
         // https://pusher.com/docs/chatkit/reference/swift#connecting
-        chatManager!.connect(delegate: MyChatManagerDelegate()) { (currentUser, error) in
-            guard(error == nil) else {
+        chatManager.connect(delegate: ChatManagerDelegate()) { (currentUser, error) in
+            guard error == nil else {
                 print("Error connecting: \(error!.localizedDescription)")
                 return
             }
-            
-            DispatchQueue.main.async {
-                // PCCurrentUser is the main entity you interact with from the Chatkit SDK
-                // You get it in a callback when successfully connected to Chatkit
-                // https://pusher.com/docs/chatkit/reference/swift#pccurrentuser
-                self.currentUser = currentUser
+            guard let currentUser = currentUser else {
+                print("currentUser was nil")
+                return
+            }
 
-                // We know our user to be in exactly one room, so get it
-                let firstRoom = currentUser!.rooms.first!
+            // We know our user to be in exactly one room, so get it
+            guard let firstRoom = currentUser.rooms.first else {
+                print("currentUser was not in any rooms")
+                return
+            }
+                
+            // PCCurrentUser is the main entity you interact with from the Chatkit SDK
+            // You get it in a callback when successfully connected to Chatkit
+            // https://pusher.com/docs/chatkit/reference/swift#pccurrentuser
+            self.currentUser = currentUser
 
-                self.dataModel = MessagesDataModel(currentUserId: currentUser!.id,
-                                                   currentUserName: currentUser!.name,
-                                                   currentUserAvatarUrl: currentUser?.avatarURL)
-                self.dataModel?.delegate = self.viewModel
+            self.dataModel = MessagesDataModel(currentUserId: currentUser.id,
+                                               currentUserName: currentUser.name,
+                                               currentUserAvatarUrl: currentUser.avatarURL)
+            self.dataModel?.delegate = self.viewModel
 
-                // Subscribe to the first room for the current user.
-                // A RoomDelegate is passed to be notified of events occurring in the room.
-                // This controller is a RoomDelegate, the implementation is in an extension below.
-                // https://pusher.com/docs/chatkit/reference/swift#subscribing-to-a-room
-                currentUser!.subscribeToRoomMultipart(room: firstRoom, 
-                                                      roomDelegate: self, 
-                                                      completionHandler: { (error) in
-                    guard error == nil else {
-                        print("Error subscribing to room: \(error!.localizedDescription)")
-                        return
-                    }
-                    print("Successfully subscribed to the room! 👋")
-                })
+            // Subscribe to the first room for the current user.
+            // A RoomDelegate is passed to be notified of events occurring in the room.
+            // This controller is a RoomDelegate, the implementation is in an extension below.
+            // https://pusher.com/docs/chatkit/reference/swift#subscribing-to-a-room
+            currentUser.subscribeToRoomMultipart(room: firstRoom, roomDelegate: self) { (error) in
+                guard error == nil else {
+                    print("Error subscribing to room: \(error!.localizedDescription)")
+                    return
+                }
+                print("Successfully subscribed to the room! 👋")
             }
         }
     }
     
-    @IBAction func onSendClicked(_ sender: Any) {
+    @IBAction private func onSendClicked(_ sender: Any) {
         sendFromTextEntry()
     }
     
-    func sendFromTextEntry() {
-        guard let text = textEntry.text else {
-            return
-        }
-        if (text.isEmpty) {
+    private func sendFromTextEntry() {
+        guard let text = textEntry.text, !text.isEmpty else {
             return
         }
         
-        let message = MessageMapper().textToMessage(text)
         self.textEntry.text = nil
         
+        let message = LocalMessage(text: text)
         sendMessage(message: message)
     }
     
-    func sendMessage(message: LocalMessage) {
+    private func sendMessage(message: LocalMessage) {
+        guard let currentUser = currentUser,
+            let firstRoom = currentUser.rooms.first else {
+            return
+        }
+        
         dataModel?.addPendingMessage(message)
         
-        currentUser!.sendMultipartMessage(
-            roomID: currentUser!.rooms.first!.id,
-            parts: message.parts,
-            completionHandler: { (messageID, error) in
-                // The callback comes from another queue, so we must update our UI back on the
-                // main queue
-                DispatchQueue.main.async {
-                    if (error != nil) {
-                        print("Error sending message: \(error!.localizedDescription)")
-                        self.dataModel?.pendingMessageFailed(message)
-                    } else {
-                        self.dataModel?.pendingMessageSent(message)
-                    }
+        currentUser.sendMultipartMessage(roomID: firstRoom.id, parts: message.parts) { (_, error) in
+            // The callback comes from another queue, so we must update our UI back on the
+            // main queue
+            DispatchQueue.main.async {
+                if let error = error {
+                    print("Error sending message: \(error.localizedDescription)")
+                    self.dataModel?.pendingMessageFailed(message)
+                } else {
+                    self.dataModel?.pendingMessageSent(message)
                 }
             }
-        )
+        }
     }
     
     // MARK: - Handle keyboard show/hide
     
-    func registerForKeyboardNotifications() {
+    private func registerForKeyboardNotifications() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(keyboardWillShow(_:)),
                                                name: UIResponder.keyboardWillShowNotification,
@@ -160,16 +161,18 @@ class ChatroomViewController: UIViewController {
     }
     
     @objc
-    func keyboardWillShow(_ notification: Notification) {
-        guard let keyboardHeight =
-            (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue.height else {
+    private func keyboardWillShow(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+            let keyboardFrameObject = userInfo[UIResponder.keyboardFrameEndUserInfoKey],
+            let keyboardFrame = keyboardFrameObject as? NSValue else {
                 return
         }
+        let keyboardHeight = keyboardFrame.cgRectValue.height
         self.bottomOfView.constant = keyboardHeight + 15
     }
 
     @objc
-    func keyboardWillHide(_ notification: Notification) {
+    private func keyboardWillHide(_ notification: Notification) {
         self.bottomOfView.constant = 30
     }
 }
@@ -180,6 +183,7 @@ class ChatroomViewController: UIViewController {
 // in a room we are subscribed to.
 // https://pusher.com/docs/chatkit/reference/swift#receiving-new-messages
 extension ChatroomViewController: PCRoomDelegate {
+    
     func onMultipartMessage(_ message: PCMultipartMessage) {
         print("Message received!")
         // Events may be received from background queues, so we must dispatch out UI updates
@@ -191,6 +195,7 @@ extension ChatroomViewController: PCRoomDelegate {
 }
 
 extension MessagesViewModel: UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         print("Number of rows requested")
         return items.count
@@ -199,48 +204,48 @@ extension MessagesViewModel: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // Get a message and fill its details into a cell
         let message = items[indexPath.row]
-        let cell: MessageTableViewCell
+        
+        let cellType: MessageTableViewCell.Type
+        let backgroundColor: UIColor
+        
         switch (message.viewType) {
         case .pending:
-            let senderCell = tableView.dequeueReusableCell(withIdentifier: "SenderMessageTableViewCell",
-                                                           for: indexPath) as! SenderMessageTableViewCell
-            
-            senderCell.setBg(color: UIColor.lightGray)
-            cell = senderCell
+            cellType = SenderMessageTableViewCell.self
+            backgroundColor = .lightGray
         case .failed:
-            let senderCell = tableView.dequeueReusableCell(withIdentifier: "SenderMessageTableViewCell",
-                                                           for: indexPath) as! SenderMessageTableViewCell
-            
-            senderCell.setBg(color: UIColor.systemPink)
-            cell = senderCell
+            cellType = SenderMessageTableViewCell.self
+            backgroundColor = .systemPink
         case .fromMe:
-            let senderCell = tableView.dequeueReusableCell(withIdentifier: "SenderMessageTableViewCell",
-                                                           for: indexPath) as! SenderMessageTableViewCell
-            
-            senderCell.setBg(color: UIColor(red: 0.19, green: 0.05, blue: 0.31, alpha: 1.0))
-            cell = senderCell
-        case .fromOther: 
-            cell = tableView.dequeueReusableCell(withIdentifier: "OthersMessageTableViewCell",
-                                                 for: indexPath) as! OthersMessageTableViewCell
+            cellType = SenderMessageTableViewCell.self
+            backgroundColor = cellType.defaultBackgroundColor
+        case .fromOther:
+            cellType = OthersMessageTableViewCell.self
+            backgroundColor = cellType.defaultBackgroundColor
         }
         
-        cell.configure(senderName: message.senderName, text: message.text)
-        
-        if (message.senderAvatarUrl != nil) {
-            cell.setImage(ImageURL: message.senderAvatarUrl!)
-        }
-        
+        let cellIdentifier = String(describing: cellType)
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) as! MessageTableViewCell
+
+        cell.configure(senderName: message.senderName,
+                       senderAvatarUrl: message.senderAvatarUrl,
+                       text: message.text,
+                       backgroundColor: backgroundColor)
         return cell
     }
 }
 
 extension ChatroomViewController: UITableViewDelegate {
+    
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        
         print("didSelectRowAt: \(indexPath.row)")
-        let item = self.dataModel?.itemAt(index: indexPath.row)
-        if case .local(let message, .failed) = item {
-            sendMessage(message: message)
+        
+        guard let item = self.dataModel?.item(at: indexPath.row),
+            case .local(let message, .failed) = item else {
+            return nil
         }
+        
+        sendMessage(message: message)
         
         // Don't actually select the row
         return nil
@@ -248,8 +253,13 @@ extension ChatroomViewController: UITableViewDelegate {
 }
 
 protocol MessageTableViewCell: UITableViewCell {
-    func configure(senderName: String, text: String)
-    func setImage(ImageURL: String)
+    
+    static var defaultBackgroundColor: UIColor { get }
+    
+    func configure(senderName: String,
+                   senderAvatarUrl: String?,
+                   text: String,
+                   backgroundColor: UIColor)
 }
 
 // MARK: - TextField delegate (send on enter keypress)
@@ -285,14 +295,13 @@ func plistValues(bundle: Bundle) -> (
     instanceLocator: String,
     tokenProviderEndpoint: String,
     userId: String,
-    roomId: String)?
+    roomId: String)
 {
     guard
         let path = bundle.path(forResource: "Chatkit", ofType: "plist"),
         let values = NSDictionary(contentsOfFile: path) as? [String: Any]
         else {
-            print("Missing Chatkit.plist file with 'ChatkitInstanceLocator', 'ChatkitTokenProviderEndpoint', 'ChatkitUserId', and 'ChatkitRoomId' entries in main bundle!")
-            return nil
+            preconditionFailure("Missing Chatkit.plist file with 'ChatkitInstanceLocator', 'ChatkitTokenProviderEndpoint', 'ChatkitUserId', and 'ChatkitRoomId' entries in main bundle!")
     }
     
     guard
@@ -301,9 +310,15 @@ func plistValues(bundle: Bundle) -> (
         let userId = values["ChatkitUserId"] as? String,
         let roomId = values["ChatkitRoomId"] as? String
         else {
-            print("Chatkit.plist file at \(path) is missing 'ChatkitInstanceLocator', 'ChatkitTokenProviderEndpoint', 'ChatkitUserId', and/or 'ChatkitRoomId' entries!")
-            print("File currently has the following entries: \(values)")
-            return nil
+            preconditionFailure("""
+                Chatkit.plist file at \(path) is missing 'ChatkitInstanceLocator', 'ChatkitTokenProviderEndpoint', 'ChatkitUserId', and/or 'ChatkitRoomId' entries!"
+                File currently has the following entries: \(values)
+            """)
     }
+    
+    guard instanceLocator != "YOUR_INSTANCE_LOCATOR" else {
+        preconditionFailure("Chatkit.plist file at \(path) needs updating with a valid 'ChatkitInstanceLocator'")
+    }
+    
     return (instanceLocator: instanceLocator, tokenProviderEndpoint: tokenProviderEndpoint, userId: userId, roomId: roomId)
 }
