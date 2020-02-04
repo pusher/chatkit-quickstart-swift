@@ -44,7 +44,7 @@ extension OthersMessageTableViewCell: MessageTableViewCell {
             URLSession.shared.dataTask(with: senderAvatarUrl) { (data, _, _) in
                 if let data = data {
                     DispatchQueue.main.async {
-                        self.avatarImageView?.image = UIImage(data: data)
+                        self.avatarImageView.image = UIImage(data: data)
                     }
                 }
             }.resume()
