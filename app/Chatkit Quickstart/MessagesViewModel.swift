@@ -1,12 +1,13 @@
 import Foundation
 
 protocol MessagesViewModelDelegate: AnyObject {
-    func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateModel: [MessagesViewModel.MessageView], updatingMessageAt index: Int)
-    func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateModel: [MessagesViewModel.MessageView], addingMessageAt index: Int)
+    func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateItems: [MessageViewItem], updatingMessageAt index: Int)
+    func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateItems: [MessageViewItem], addingMessageAt index: Int)
 }
 
-class MessagesViewModel: NSObject {
-    
+
+struct MessageViewItem {
+
     enum ViewType {
         case pending
         case failed
@@ -14,35 +15,36 @@ class MessagesViewModel: NSObject {
         case fromOther
     }
     
-    struct MessageView {
-        let senderName: String
-        let senderAvatarUrl: String?
-        let text: String
-        let viewType: ViewType
-    }
-    
-    private(set) var items = [MessageView]()
-    
+    let senderName: String
+    let senderAvatarUrl: String?
+    let text: String
+    let viewType: ViewType
+}
+
+class MessagesViewModel: NSObject {
+
+    private(set) var items = [MessageViewItem]()
+
     weak var delegate: MessagesViewModelDelegate?
 
-    private func updateItems(with model: MessagesDataModel.MessagesModel) {
+    private func updateMessageViewItems(withDataModel dataModel: MessagesDataModel) {
 
-        self.items = model.items.map { (item: MessagesDataModel.MessageItem) -> MessageView in
+        items = dataModel.items.map { (item: MessageDataItem) -> MessageViewItem in
             let senderName: String
             let senderAvatarUrl: String?
             let text: String
-            let viewType: ViewType
+            let viewType: MessageViewItem.ViewType
             
             switch (item) {
-            case MessagesDataModel.MessageItem.fromServer(let message):
+            case .fromServer(let message):
                 senderName = message.sender.name ?? "Anonymous User"
                 senderAvatarUrl = message.sender.avatarURL
                 text = message.text
-                viewType = message.sender.id == model.currentUserId ? .fromMe : .fromOther
+                viewType = message.sender.id == dataModel.currentUserId ? .fromMe : .fromOther
             
-            case MessagesDataModel.MessageItem.local(let message, let state):
-                senderName = model.currentUserName ?? "Anonymous User"
-                senderAvatarUrl = model.currentUserAvatarUrl
+            case .local(let message, let state):
+                senderName = dataModel.currentUserName ?? "Anonymous User"
+                senderAvatarUrl = dataModel.currentUserAvatarUrl
                 text = message.text
                 switch (state) {
                 case .pending: 
@@ -54,29 +56,29 @@ class MessagesViewModel: NSObject {
                 }
             }
             
-            return MessageView(senderName: senderName,
-                               senderAvatarUrl: senderAvatarUrl,
-                               text: text,
-                               viewType: viewType)
+            return MessageViewItem(senderName: senderName,
+                                   senderAvatarUrl: senderAvatarUrl,
+                                   text: text,
+                                   viewType: viewType)
         }
     }
 }
 
-extension MessagesViewModel: MessagesDataModelDelegate {
+extension MessagesViewModel: MessagesStoreDelegate {
     
-    func messagesDataModel(_ messagesDataModel: MessagesDataModel, didUpdateModel messagesModel: MessagesDataModel.MessagesModel, addingMessageAt index: Int) {
+    func messagesStore(_ messagesStore: MessagesStore, didUpdateDataModel messagesDataModel: MessagesDataModel, addingMessageAt index: Int) {
         print("Data model updated")
         
-        updateItems(with: messagesModel)
+        updateMessageViewItems(withDataModel: messagesDataModel)
         
-        delegate?.messagesViewModel(self, didUpdateModel: items, addingMessageAt: index)
+        delegate?.messagesViewModel(self, didUpdateItems: items, addingMessageAt: index)
     }
     
-    func messagesDataModel(_ messagesDataModel: MessagesDataModel, didUpdateModel messagesModel: MessagesDataModel.MessagesModel, updatingMessageAt index: Int) {
+    func messagesStore(_ messagesStore: MessagesStore, didUpdateDataModel messagesDataModel: MessagesDataModel, updatingMessageAt index: Int) {
         print("Data model updated")
         
-        updateItems(with: messagesModel)
+        updateMessageViewItems(withDataModel: messagesDataModel)
         
-        delegate?.messagesViewModel(self, didUpdateModel: items, updatingMessageAt: index)
+        delegate?.messagesViewModel(self, didUpdateItems: items, updatingMessageAt: index)
     }
 }
