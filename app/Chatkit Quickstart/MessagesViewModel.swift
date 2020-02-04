@@ -1,6 +1,6 @@
 import Foundation
 
-protocol MessagesViewModelDelegate {
+protocol MessagesViewModelDelegate: AnyObject {
     func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateModel: [MessagesViewModel.MessageView], updatingMessageAt index: Int)
     func messagesViewModel(_ messagesViewModel: MessagesViewModel, didUpdateModel: [MessagesViewModel.MessageView], addingMessageAt index: Int)
 }
@@ -23,7 +23,7 @@ class MessagesViewModel: NSObject {
     
     private(set) var items = [MessageView]()
     
-    var delegate: MessagesViewModelDelegate?
+    weak var delegate: MessagesViewModelDelegate?
 
     private func updateItems(with model: MessagesDataModel.MessagesModel) {
 

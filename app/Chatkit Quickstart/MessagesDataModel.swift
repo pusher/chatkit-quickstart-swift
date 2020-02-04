@@ -48,7 +48,7 @@ extension PCMultipartMessage {
     }
 }
 
-protocol MessagesDataModelDelegate {
+protocol MessagesDataModelDelegate: NSObject {
     func messagesDataModel(_ messagesDataModel: MessagesDataModel, didUpdateModel messagesModel: MessagesDataModel.MessagesModel, addingMessageAt index: Int)
     func messagesDataModel(_ messagesDataModel: MessagesDataModel, didUpdateModel messagesModel: MessagesDataModel.MessagesModel, updatingMessageAt index: Int)
 }
@@ -73,7 +73,7 @@ class MessagesDataModel {
         let items: [MessageItem]
     }
     
-    var delegate: MessagesDataModelDelegate?
+    weak var delegate: MessagesDataModelDelegate?
     
     private let currentUserId: String
     private let currentUserName: String?
