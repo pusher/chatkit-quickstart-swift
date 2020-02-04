@@ -84,27 +84,31 @@ class ChatroomViewController: UIViewController {
                 print("currentUser was not in any rooms")
                 return
             }
+        
+            DispatchQueue.main.async {
                 
-            // PCCurrentUser is the main entity you interact with from the Chatkit SDK
-            // You get it in a callback when successfully connected to Chatkit
-            // https://pusher.com/docs/chatkit/reference/swift#pccurrentuser
-            self.currentUser = currentUser
+                // PCCurrentUser is the main entity you interact with from the Chatkit SDK
+                // You get it in a callback when successfully connected to Chatkit
+                // https://pusher.com/docs/chatkit/reference/swift#pccurrentuser
+                self.currentUser = currentUser
 
             self.store = MessagesStore(currentUserId: currentUser.id,
                                        currentUserName: currentUser.name,
                                        currentUserAvatarUrl: currentUser.avatarURL)
             self.store?.delegate = self.viewModel
 
-            // Subscribe to the first room for the current user.
-            // A RoomDelegate is passed to be notified of events occurring in the room.
-            // This controller is a RoomDelegate, the implementation is in an extension below.
-            // https://pusher.com/docs/chatkit/reference/swift#subscribing-to-a-room
-            currentUser.subscribeToRoomMultipart(room: firstRoom, roomDelegate: self) { (error) in
-                guard error == nil else {
-                    print("Error subscribing to room: \(error!.localizedDescription)")
-                    return
+                // Subscribe to the first room for the current user.
+                // A RoomDelegate is passed to be notified of events occurring in the room.
+                // This controller is a RoomDelegate, the implementation is in an extension below.
+                // https://pusher.com/docs/chatkit/reference/swift#subscribing-to-a-room
+                currentUser.subscribeToRoomMultipart(room: firstRoom, roomDelegate: self) { (error) in
+                    guard error == nil else {
+                        print("Error subscribing to room: \(error!.localizedDescription)")
+                        return
+                    }
+                    print("Successfully subscribed to the room! 👋")
                 }
-                print("Successfully subscribed to the room! 👋")
+                
             }
         }
     }
