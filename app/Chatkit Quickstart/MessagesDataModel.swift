@@ -4,11 +4,6 @@ import PusherChatkit
 private let MIME_TYPE_INTERNAL_ID = "com-pusher-gettingstarted/internal-id"
 private let MIME_TYPE_TEXT = "text/plain"
 
-enum ChangeType {
-    case itemAdded(index: Int)
-    case itemUpdated(index: Int)
-}
-
 struct LocalMessage {
     let text: String
     let internalId: String
