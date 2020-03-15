@@ -77,11 +77,11 @@ fi
 
 echo "🔑  ${GREEN}${BOLD}Adding credentials to project${RESET}"
 # Inject locator
-sed -e "s/YOUR_INSTANCE_LOCATOR/$locator/g" -i ./Chatkit\ Quickstart/Chatkit.plist
+sed -i -e "s/YOUR_INSTANCE_LOCATOR/$locator/g" ./Chatkit\ Quickstart/Chatkit.plist
 # Inject cluster
-sed -e "s/YOUR_CLUSTER/$cluster/g" -i ./Chatkit\ Quickstart/Chatkit.plist
+sed -i -e "s/YOUR_CLUSTER/$cluster/g" ./Chatkit\ Quickstart/Chatkit.plist
 # Inject instance ID
-sed -e "s/YOUR_INSTANCE_ID/$instanceId/g" -i ./Chatkit\ Quickstart/Chatkit.plist
+sed -i -e "s/YOUR_INSTANCE_ID/$instanceId/g" ./Chatkit\ Quickstart/Chatkit.plist
 
 # Open the project with Xcode
 echo "🚀  ${GREEN}${BOLD}Chatkit quick start app ready to launch${RESET}"
